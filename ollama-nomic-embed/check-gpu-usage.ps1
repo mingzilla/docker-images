@@ -1,0 +1,1 @@
+docker exec ollama-service nvidia-smi
