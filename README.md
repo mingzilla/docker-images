@@ -8,3 +8,27 @@
 | ollama-nomic-embed   | Embedding               | CPU or GPU | Official nomic-embed-text                   |
 | ollama-nomic-llama3  | Embedding + Completions | CPU or GPU | Official nomic-embed-text, llama3.2:3b      |
 | ollama-llama3        | Completions             | CPU or GPU | Official llama3.2:3b                        |
+
+## Upgrade Ollama
+
+1. Dockerfile
+
+Find and replace version
+
+2. _build-image.sh
+
+Find and replace version number to build in each of these files.
+Each project has a different number. This affects:
+
+- _build-image.sh
+- docker-compose.yml
+
+3. _publish-docker.sh
+
+Run this.
+
+4. global find and replace all the docker images.
+
+- mingzilla/ollama-llama3:1.0.0 -> mingzilla/ollama-llama3:1.0.1
+- mingzilla/ollama-nomic-embed:1.0.2 -> mingzilla/ollama-nomic-embed:1.0.3
+- mingzilla/ollama-nomic-llama3:1.0.0 -> mingzilla/ollama-nomic-llama3:1.0.1

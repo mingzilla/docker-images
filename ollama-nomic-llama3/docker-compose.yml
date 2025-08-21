@@ -1,6 +1,6 @@
 services:
   ollama:
-    image: mingzilla/ollama-nomic-llama3:1.0.0
+    image: mingzilla/ollama-nomic-llama3:1.0.1
     container_name: ollama-nomic-llama3
     ports:
       - "11435:11434"
