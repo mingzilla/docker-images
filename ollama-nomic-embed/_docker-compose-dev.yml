@@ -3,9 +3,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ollama-service
+    container_name: ollama-nomic
     ports:
-      - "11434:11434"
+      - "30102:11434"
     environment:
       - OLLAMA_HOST=0.0.0.0
     restart: unless-stopped

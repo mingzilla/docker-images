@@ -28,7 +28,7 @@ This project creates a Docker image that:
 - **Framework**: FastAPI + uvicorn
 - **Model**: sentence-transformers/all-MiniLM-L6-v2
 - **Internal Port**: 8000
-- **External Port**: 11434 (via docker-compose)
+- **External Port**: 30101 (via docker-compose)
 - **Container Name**: `api_all-minilm-l6-v2`
 - **Image Name**: `mingzilla/api_all-minilm-l6-v2`
 
@@ -41,10 +41,10 @@ This project creates a Docker image that:
 docker-compose up -d
 
 # Check health
-curl http://localhost:11434/health
+curl http://localhost:30101/health
 
 # Test embedding
-curl -X POST http://localhost:11434/v1/embeddings \
+curl -X POST http://localhost:30101/v1/embeddings \
   -H "Content-Type: application/json" \
   -d '{"model": "all-MiniLM-L6-v2", "input": "Hello, world!"}'
 ```
@@ -55,11 +55,11 @@ curl -X POST http://localhost:11434/v1/embeddings \
 # Run container directly
 docker run -d \
   --name api_all-minilm-l6-v2 \
-  -p 11434:8000 \
+  -p 30101:8000 \
   mingzilla/api_all-minilm-l6-v2:latest
 
 # Test the service
-curl http://localhost:11434/health
+curl http://localhost:30101/health
 ```
 
 ## API Endpoints

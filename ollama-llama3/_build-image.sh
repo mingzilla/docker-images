@@ -2,6 +2,7 @@
 
 # Build custom Ollama image with pre-installed models
 echo "Building custom Ollama image with pre-installed models..."
+docker builder prune -f
 docker build -t mingzilla/ollama-llama3:1.0.1 -t mingzilla/ollama-llama3:latest -f Dockerfile .
 
 echo "Build completed."

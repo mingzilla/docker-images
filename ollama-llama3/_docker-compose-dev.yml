@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: ollama-llama3
     ports:
-      - "11434:11434"
+      - "30201:11434"
     environment:
       - OLLAMA_HOST=0.0.0.0
     restart: unless-stopped

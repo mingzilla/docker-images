@@ -2,6 +2,7 @@
 
 # Build custom Ollama image with pre-installed models
 echo "Building custom Ollama image with pre-installed models..."
+docker builder prune -f
 docker build -t mingzilla/ollama-nomic-embed:1.0.3 -t mingzilla/ollama-nomic-embed:latest -f Dockerfile .
 
 echo "Build completed."

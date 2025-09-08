@@ -3,7 +3,7 @@ services:
     image: mingzilla/api_all-minilm-l6-v2:latest
     container_name: api_all-minilm-l6-v2
     ports:
-      - "11434:8000"
+      - "30101:8000"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
