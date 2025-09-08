@@ -10,6 +10,8 @@
 | ollama-nomic-llama3   | Embedding + Completions | CPU or GPU | Official nomic-embed-text, llama3.2:3b      |
 | ollama-llama3         | Completions             | CPU or GPU | Official llama3.2:3b                        |
 
+Refer to [embedding-model-selection.md](_docs/embedding-model-selection.md) for embedding model selection.
+
 ## Upgrade Ollama
 
 1. Dockerfile

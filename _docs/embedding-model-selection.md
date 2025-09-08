@@ -12,7 +12,7 @@ Typical Use Case:
 
 | Feature             | **all-MiniLM-L6-v2**               | **nomic-embed-text-v1**                                   | **EmbeddingGemma (300M)**                                            |
 |:--------------------|:-----------------------------------|:----------------------------------------------------------|:---------------------------------------------------------------------|
-| **Size/Dimensions** | 22.7M params, **384-dim**          | 137M params, **768-dim**                                  | 307M params, **768-dim**                                             |
+| **Size/Dimensions** | 22.7M params, **384-dim**          | 137M params, **768-dim**                                  | 308M params, **768-dim**                                             |
 | **Key Strength**    | **Speed & Efficiency** 🚀          | Strong general-purpose accuracy                           | **State-of-the-art accuracy**, multilingual, **scalable dimensions** |
 | **Key Weakness**    | Lower accuracy on nuanced tasks    | Slower than MiniLM                                        | Larger size than MiniLM                                              |
 | **Best For**        | Fast, simple tasks on English data | General retrieval needing a balance of accuracy and speed | **High-accuracy tasks**, multilingual data, and **resource-tuning**  |
