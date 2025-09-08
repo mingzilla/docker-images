@@ -10,12 +10,15 @@ Typical Use Case:
 
 ## 1. Model Comparison Table
 
-| Feature             | **all-MiniLM-L6-v2**               | **nomic-embed-text-v1**                                   | **EmbeddingGemma (300M)**                                            |
-|:--------------------|:-----------------------------------|:----------------------------------------------------------|:---------------------------------------------------------------------|
-| **Size/Dimensions** | 22.7M params, **384-dim**          | 137M params, **768-dim**                                  | 308M params, **768-dim**                                             |
-| **Key Strength**    | **Speed & Efficiency** 🚀          | Strong general-purpose accuracy                           | **State-of-the-art accuracy**, multilingual, **scalable dimensions** |
-| **Key Weakness**    | Lower accuracy on nuanced tasks    | Slower than MiniLM                                        | Larger size than MiniLM                                              |
-| **Best For**        | Fast, simple tasks on English data | General retrieval needing a balance of accuracy and speed | **High-accuracy tasks**, multilingual data, and **resource-tuning**  |
+| **Model**                | **all-MiniLM-L6-v2**                                                         | **nomic-embed-text-v1**                                             | **EmbeddingGemma**                                                         |
+|:-------------------------|:-----------------------------------------------------------------------------|:--------------------------------------------------------------------|:---------------------------------------------------------------------------|
+| **Architecture & Size**  | 6-layer MiniLM, 22.7M params, 384-dim embeddings                             | BERT-based, 235M params, 768-dim embeddings                         | Gemma 3-based, 308M params, 768-dim (flexible down to 128)                 |
+| **Accuracy**             | Good for general semantic similarity, may struggle with nuanced distinctions | Better accuracy than MiniLM (e.g., ~81.2% vs. ~80.04% on Banking77) | **State-of-the-art for its size**, outperforms larger models on some tasks |
+| **Speed & Efficiency**   | **Very fast** (~14.7 ms/1K tokens), ideal for high-throughput applications   | Slower than MiniLM (~206 sec/1M tokens)                             | Optimized for on-device use, <22ms latency on EdgeTPU                      |
+| **Context Length**       | 256 word pieces (truncates longer text)                                      | 2048 tokens                                                         | 2048 tokens                                                                |
+| **Multilingual Support** | Limited to English                                                           | Supports multiple languages                                         | **Supports 100+ languages**                                                |
+| **Customization**        | Can be fine-tuned but limited by size                                        | Supports task-specific prefixes (e.g., `search_query:`)             | **Matryoshka Learning**: Embedding size customizable (768 to 128)          |
+| **Ideal Use Case**       | High-speed, low-resource environments with simple semantic matching          | General-purpose retrieval with better accuracy than MiniLM          | **On-device or multilingual applications** requiring high quality          |
 
 **Verdict:**
 
