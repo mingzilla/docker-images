@@ -1,0 +1,13 @@
+services:
+  api_all-minilm-l6-v2:
+    image: mingzilla/api_all-minilm-l6-v2:latest
+    container_name: api_all-minilm-l6-v2
+    ports:
+      - "30101:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
