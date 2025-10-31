@@ -22,7 +22,8 @@ A JSON file to configure the input and output of the embedding process.
       "input_table": "source_texts",
       "id_column": "document_id",
       "text_column": "content",
-      "output_table": "embedded_texts"
+      "output_table": "embedded_texts",
+      "batch_size": 15000
     }
     ```
 
@@ -30,32 +31,32 @@ A JSON file to configure the input and output of the embedding process.
 This script will be the entry point for the embedding process.
 
 *   **Purpose:** Load the embedding model and configuration, then delegate the DuckDB processing to the shared utility.
-*   **Dependencies:** `torch`, `sentence-transformers`, `duckdb` (indirectly via utility), `json`, `os`, and the new `duckdb_embed_processor` utility.
+*   **Dependencies:** `torch`, `sentence-transformers`, `json`, `os`, `src.config.Config`, and the new `src.shared_utils.external.duckdb_processor.duckdb_embed_processor` utility.
 
 #### `src/shared_utils/external/duckdb_processor/duckdb_embed_processor.py` (New Python Utility Module)
 This module will contain the core, reusable DuckDB processing logic.
 
 *   **Purpose:** To handle all DuckDB I/O, batching, and orchestrate the embedding calls using a provided model instance.
-*   **Dependencies:** `duckdb`, `SimplerTimer` (from `src/shared_utils/external/operation_logging/simple_timer.py`), `os`, `logging`.
-*   **Key Function:** `process_duckdb_for_embeddings(config: dict, model_instance: SentenceTransformer, batch_size: int)`
+*   **Dependencies:** `duckdb`, `src.shared_utils.external.operation_logging.simple_timer.SimplerTimer`, `os`, `logging`.
+*   **Key Function:** `process_duckdb_for_embeddings(config: src.config.Config, model_instance: SentenceTransformer)`
 
 #### `embed.sh` (New Shell Script)
 A wrapper script to simplify execution.
 
 *   **Purpose:** To configure and run the Docker container and the `embed.py` script with the correct parameters.
 *   **Logic:**
-    1.  Reads a `BATCH_SIZE` environment variable, with a sensible default.
-    2.  Prints the `BATCH_SIZE` being used and reminds the user about `check_benchmark.sh`.
-    3.  Uses `docker run` (or `docker-compose run`) to execute `embed.py` inside the container.
-    4.  Crucially, it will mount the current directory into the container (e.g., `/data`) so the script can access `config.json` and the DuckDB files.
+    1.  Prints the `batch_size` (read from `config.json` by `embed.py`) being used and reminds the user about `check_benchmark.sh`.
+    2.  Uses `docker run` (or `docker-compose run`) to execute `embed.py` inside the container.
+    3.  Crucially, it will mount the current directory into the container (e.g., `/app/`) so the script can access `config.json` and the DuckDB files.
 
 #### `Dockerfile`
 The existing Dockerfile will require minor modifications.
 
 *   **Changes:**
     1.  Add `duckdb` to `requirements.txt`.
-    2.  Add `COPY embed.py ./` to include the new entry point script.
+    2.  Add `COPY src/embed.py /app/src/` to include the new entry point script.
     3.  Add `COPY src/shared_utils/external/duckdb_processor/ /app/src/shared_utils/external/duckdb_processor/` to include the utility module.
+    4.  Ensure `COPY src/config.py /app/src/` is present or added.
 
 ## 3. Execution Workflow
 
@@ -63,24 +64,23 @@ The existing Dockerfile will require minor modifications.
 2.  The user executes `./embed.sh`.
 3.  The script starts the Docker container, mounting the local directory.
 4.  Inside the container, `embed.py` runs.
-5.  `embed.py` loads `config.json` and the embedding model.
-6.  It then calls `duckdb_embed_processor.process_duckdb_for_embeddings()` with the configuration, model instance, and batch size.
+5.  `embed.py` loads `config.json` using `src.config.Config` and the embedding model.
+6.  It then calls `src.shared_utils.external.duckdb_processor.duckdb_embed_processor.process_duckdb_for_embeddings()` with the configuration object and model instance.
 7.  The utility handles all DuckDB I/O, batching, embedding, and result insertion.
 8.  The script finishes, and the container stops. `output.duckdb` is available on the host machine.
 
 ## 4. Implementation Plan for `embed.py` (Thin Wrapper)
 
 1.  **Setup:**
-    *   Import necessary libraries (`json`, `os`, `torch`, `sentence_transformers`, `duckdb_embed_processor`).
+    *   Import necessary libraries (`json`, `os`, `torch`, `sentence_transformers`, `src.config.Config`, `src.shared_utils.external.duckdb_processor.duckdb_embed_processor`).
     *   Define `MODEL_NAME`.
-    *   Get `BATCH_SIZE` from an environment variable (with a default).
-    *   Load `config.json`.
+    *   Load `config.json` using `config_obj = Config('config.json')`.
 
 2.  **Model Loading:**
     *   Load the `sentence-transformers` model, explicitly placing it on the `cuda` device if available.
 
 3.  **Delegate to Utility:**
-    *   Call `duckdb_embed_processor.process_duckdb_for_embeddings(config, model, BATCH_SIZE)`.
+    *   Call `src.shared_utils.external.duckdb_processor.duckdb_embed_processor.process_duckdb_for_embeddings(config_obj, model)`.
 
 ## 5. Implementation Plan for `duckdb_embed_processor.py` (Core Logic)
 
@@ -89,9 +89,8 @@ This module will contain the detailed steps for DuckDB I/O, batching, calling `m
 1.  **Function Signature:**
     ```python
     def process_duckdb_for_embeddings(
-        config: dict,
+        config: src.config.Config,
         model_instance: SentenceTransformer,
-        batch_size: int,
         logger: logging.Logger
     ):
         # ... implementation ...
@@ -104,16 +103,16 @@ This module will contain the detailed steps for DuckDB I/O, batching, calling `m
     *   Create the output table in the output database with the schema: `(id_column, text_column, vector_column FLOAT[])`.
 
 3.  **Processing Loop:**
-    *   Integrate `SimplerTimer` to track overall and batch processing times.
+    *   Integrate `src.shared_utils.external.operation_logging.simple_timer.SimplerTimer` to track overall and batch processing times.
     *   Implement resumeability: Before starting the main loop, query `output.duckdb` to find the last successfully processed `id_column` value. Adjust the initial `OFFSET` for the input query.
     *   Use a `WHILE` or `FOR` loop with `OFFSET` and `LIMIT` clauses to pull data from the input table.
-    *   **`SELECT {id_column}, {text_column} FROM {input_table} ORDER BY {id_column} LIMIT {BATCH_SIZE} OFFSET {current_offset}`**
+    *   **`SELECT {id_column}, {text_column} FROM {input_table} ORDER BY {id_column} LIMIT {config.batch_size} OFFSET {current_offset}`**
     *   In each loop iteration:
         a. Fetch the batch of data into a Pandas DataFrame or list of tuples.
         b. Extract the text column into a list.
         c. Call `model_instance.encode(texts, convert_to_tensor=False, normalize_embeddings=True)` to generate the embeddings.
         d. Prepare the results for insertion, combining the IDs, original text, and the new embedding vectors.
-        e. Use `duckdb_connection.executemany()` to perform a fast, bulk insert of the batch into the output table.
+        e. Use a high-performance bulk insert pattern (e.g., `connection.append()` with a Pandas DataFrame or the `register() + INSERT` pattern) to save the batch to the output table.
         f. Print a progress update (e.g., "Processed 15000 / 10000000 records...").
 
 ## 6. Reusability and Maintainability
