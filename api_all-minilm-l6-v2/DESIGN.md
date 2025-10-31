@@ -36,18 +36,17 @@ This script will be the entry point for the embedding process.
 #### `src/shared_utils/external/duckdb_processor/duckdb_embed_processor.py` (New Python Utility Module)
 This module will contain the core, reusable DuckDB processing logic.
 
-*   **Purpose:** To handle all DuckDB I/O, batching, and orchestrate the embedding calls using a provided model instance.
-*   **Dependencies:** `duckdb`, `src.shared_utils.external.operation_logging.simple_timer.SimplerTimer`, `os`, `logging`.
-*   **Key Function:** `process_duckdb_for_embeddings(config: src.config.Config, model_instance: SentenceTransformer)`
+*   **Purpose:** To handle all DuckDB I/O, batching, and orchestrate the transformation by invoking a provided callback function.
+*   **Dependencies:** `duckdb`, `src.shared_utils.external.operation_logging.simple_timer.SimplerTimer`, `os`, `logging`, `typing.Callable`.
+*   **Key Function:** `process_duckdb(config: src.config.Config, embed_callback: Callable[[list[str]], list[list[float]]])`
 
 #### `embed.sh` (New Shell Script)
 A wrapper script to simplify execution.
 
 *   **Purpose:** To configure and run the Docker container and the `embed.py` script with the correct parameters.
 *   **Logic:**
-    1.  Prints the `batch_size` (read from `config.json` by `embed.py`) being used and reminds the user about `check_benchmark.sh`.
-    2.  Uses `docker run` (or `docker-compose run`) to execute `embed.py` inside the container.
-    3.  Crucially, it will mount the current directory into the container (e.g., `/app/`) so the script can access `config.json` and the DuckDB files.
+    1.  Uses `docker run` (or `docker-compose run`) to execute `embed.py` inside the container.
+    2.  Crucially, it will mount the current directory into the container (e.g., `/app/`) so the script can access `config.json` and the DuckDB files.
 
 #### `Dockerfile`
 The existing Dockerfile will require minor modifications.
@@ -65,11 +64,12 @@ The existing Dockerfile will require minor modifications.
 3.  The script starts the Docker container, mounting the local directory.
 4.  Inside the container, `embed.py` runs.
 5.  `embed.py` loads `config.json` using `src.config.Config` and the embedding model.
-6.  It then calls `src.shared_utils.external.duckdb_processor.duckdb_embed_processor.process_duckdb_for_embeddings()` with the configuration object and model instance.
-7.  The utility handles all DuckDB I/O, batching, embedding, and result insertion.
-8.  The script finishes, and the container stops. `output.duckdb` is available on the host machine.
+6.  It defines a `callback function` that knows how to use the model to embed a list of texts.
+7.  It then calls `src.shared_utils.external.duckdb_processor.duckdb_embed_processor.process_duckdb()` with the configuration object and the callback function.
+8.  The utility handles all DuckDB I/O, batching, calls the callback for each batch, and writes the results.
+9.  The script finishes, and the container stops. `output.duckdb` is available on the host machine.
 
-## 4. Implementation Plan for `embed.py` (Thin Wrapper)
+## 4. Implementation Plan for `embed.py` (The "Glue" Script)
 
 1.  **Setup:**
     *   Import necessary libraries (`json`, `os`, `torch`, `sentence_transformers`, `src.config.Config`, `src.shared_utils.external.duckdb_processor.duckdb_embed_processor`).
@@ -79,18 +79,32 @@ The existing Dockerfile will require minor modifications.
 2.  **Model Loading:**
     *   Load the `sentence-transformers` model, explicitly placing it on the `cuda` device if available.
 
-3.  **Delegate to Utility:**
-    *   Call `src.shared_utils.external.duckdb_processor.duckdb_embed_processor.process_duckdb_for_embeddings(config_obj, model)`.
+3.  **Callback Definition:**
+    *   Define the callback function that will be passed to the utility. This function will close over the loaded `model`.
+    ```python
+    def embed_texts_callback(texts: list[str]) -> list[list[float]]:
+        embeddings = model.encode(
+            texts,
+            convert_to_tensor=False,
+            normalize_embeddings=True
+        )
+        return embeddings.tolist()
+    ```
+
+4.  **Delegate to Utility:**
+    *   Call `src.shared_utils.external.duckdb_processor.duckdb_embed_processor.process_duckdb(config_obj, embed_texts_callback)`.
 
 ## 5. Implementation Plan for `duckdb_embed_processor.py` (Core Logic)
 
-This module will contain the detailed steps for DuckDB I/O, batching, calling `model_instance.encode()`, and inserting results.
+This module will contain the detailed steps for DuckDB I/O, batching, and invoking the provided callback.
 
 1.  **Function Signature:**
     ```python
-    def process_duckdb_for_embeddings(
+    from typing import Callable
+
+    def process_duckdb(
         config: src.config.Config,
-        model_instance: SentenceTransformer,
+        embed_callback: Callable[[list[str]], list[list[float]]],
         logger: logging.Logger
     ):
         # ... implementation ...
@@ -110,13 +124,13 @@ This module will contain the detailed steps for DuckDB I/O, batching, calling `m
     *   In each loop iteration:
         a. Fetch the batch of data into a Pandas DataFrame or list of tuples.
         b. Extract the text column into a list.
-        c. Call `model_instance.encode(texts, convert_to_tensor=False, normalize_embeddings=True)` to generate the embeddings.
+        c. Call `embeddings = embed_callback(texts)` to generate the embeddings.
         d. Prepare the results for insertion, combining the IDs, original text, and the new embedding vectors.
         e. Use a high-performance bulk insert pattern (e.g., `connection.append()` with a Pandas DataFrame or the `register() + INSERT` pattern) to save the batch to the output table.
         f. Print a progress update (e.g., "Processed 15000 / 10000000 records...").
 
 ## 6. Reusability and Maintainability
 
-*   The `duckdb_embed_processor.py` module is designed to be self-contained and model-agnostic. It accepts the `model_instance` as an argument, meaning it doesn't care *which* `SentenceTransformer` model is being used, only that it provides an `encode` method.
-*   To use this utility with a different embedding model, simply copy the `duckdb_processor` directory into the new model's `src/shared_utils/external/` path. The `embed.py` script in that new model's project would then import and use it.
+*   The `duckdb_embed_processor.py` module is now truly model-agnostic. It only requires a callback function that transforms a list of strings into a list of vectors.
+*   To use this utility with a different embedding model (e.g., one that calls an API), you would create a new `embed.py` script for that model, define a different callback function, and reuse the `duckdb_embed_processor` without any changes.
 *   Updates to the core DuckDB processing logic only need to be made in this single utility module.
