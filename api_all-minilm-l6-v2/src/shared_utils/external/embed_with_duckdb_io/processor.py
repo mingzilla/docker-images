@@ -54,6 +54,10 @@ def process_duckdb(
             # Validate input table and columns exist
             _validate_input_table(input_conn, config)
 
+            # Get the data type of the ID column
+            id_column_type = _get_column_type(input_conn, config.input_table, config.id_column)
+            logger.info(f"ID column '{config.id_column}' type: {id_column_type}")
+
             # Get total count from input table
             total_input_rows = input_conn.execute(
                 f"SELECT COUNT(*) FROM {config.input_table}"
@@ -66,13 +70,14 @@ def process_duckdb(
             rows_to_process = min(total_input_rows, config.total_rows)
 
             # Check if output table exists and get last processed ID for resumeability
-            last_processed_id = _get_last_processed_id(output_conn, config)
+            last_processed_id = _get_last_processed_id(output_conn, config, id_column_type)
 
             if last_processed_id is None:
                 # Create output table with VSS-compatible schema
-                _create_output_table(output_conn, config)
+                _create_output_table(output_conn, config, id_column_type)
                 logger.info(f"Created output table: {config.output_table}")
-                last_processed_id = 0
+                # Set initial value based on column type
+                last_processed_id = _get_initial_value_for_type(id_column_type)
                 processed_count = 0
             else:
                 # Get count of already processed rows
@@ -200,10 +205,11 @@ def _validate_input_table(conn: duckdb.DuckDBPyConnection, config: Config) -> No
         raise ValueError(f"Text column '{config.text_column}' not found in table '{config.input_table}'")
 
 
-def _get_last_processed_id(conn: duckdb.DuckDBPyConnection, config: Config):
+def _get_last_processed_id(conn: duckdb.DuckDBPyConnection, config: Config, id_column_type: str):
     """
     Get the last processed ID from output table for resumeability.
     Returns None if table doesn't exist, or the max ID value.
+    If table exists but is empty, returns appropriate initial value for the type.
     """
 
     # Check if output table exists
@@ -220,23 +226,84 @@ def _get_last_processed_id(conn: duckdb.DuckDBPyConnection, config: Config):
         f"SELECT MAX({config.id_column}) FROM {config.output_table}"
     ).fetchone()
 
-    return result[0] if result[0] is not None else 0
+    return result[0] if result[0] is not None else _get_initial_value_for_type(id_column_type)
 
 
-def _create_output_table(conn: duckdb.DuckDBPyConnection, config: Config) -> None:
+def _create_output_table(conn: duckdb.DuckDBPyConnection, config: Config, id_column_type: str) -> None:
     """
     Create output table with VSS-compatible schema.
 
     Schema: (id_column, text_column, embedding FLOAT[])
     The FLOAT[] type is compatible with DuckDB's VSS extension for cosine similarity search.
+    The id_column type matches the source table's type.
     """
 
     create_table_sql = f"""
         CREATE TABLE {config.output_table} (
-            {config.id_column} INTEGER,
+            {config.id_column} {id_column_type},
             {config.text_column} TEXT,
             embedding FLOAT[]
         )
     """
 
     conn.execute(create_table_sql)
+
+
+def _get_column_type(conn: duckdb.DuckDBPyConnection, table_name: str, column_name: str) -> str:
+    """
+    Get the data type of a column from the database schema.
+
+    Args:
+        conn: DuckDB connection
+        table_name: Name of the table
+        column_name: Name of the column
+
+    Returns:
+        Data type as a string (e.g., 'INTEGER', 'VARCHAR', 'BIGINT')
+    """
+    result = conn.execute(
+        """
+        SELECT data_type
+        FROM information_schema.columns
+        WHERE table_name = ? AND column_name = ?
+        """,
+        [table_name, column_name]
+    ).fetchone()
+
+    if result is None:
+        raise ValueError(f"Column '{column_name}' not found in table '{table_name}'")
+
+    return result[0]
+
+
+def _get_initial_value_for_type(data_type: str):
+    """
+    Get an appropriate initial value for comparison based on the column data type.
+
+    For numeric types: returns 0
+    For string types: returns '' (empty string)
+
+    Args:
+        data_type: The SQL data type (e.g., 'INTEGER', 'VARCHAR', 'BIGINT')
+
+    Returns:
+        Initial value compatible with the data type
+    """
+    # Normalize type to uppercase for comparison
+    data_type_upper = data_type.upper()
+
+    # Numeric types
+    if any(numeric_type in data_type_upper for numeric_type in [
+        'INT', 'INTEGER', 'BIGINT', 'SMALLINT', 'TINYINT',
+        'DECIMAL', 'NUMERIC', 'FLOAT', 'DOUBLE', 'REAL'
+    ]):
+        return 0
+
+    # String types
+    if any(string_type in data_type_upper for string_type in [
+        'CHAR', 'VARCHAR', 'TEXT', 'STRING'
+    ]):
+        return ''
+
+    # Default to empty string for unknown types (safe fallback)
+    return ''
