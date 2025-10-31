@@ -94,62 +94,74 @@ def process_duckdb(
             while processed_count < rows_to_process:
                 batch_number += 1
 
-                # Calculate how many rows to fetch in this batch
-                remaining_rows = rows_to_process - processed_count
-                current_batch_size = min(config.batch_size, remaining_rows)
+                # Create a timer for this batch to track detailed timing
+                with SimplerTimer() as batch_timer:
+                    # Calculate how many rows to fetch in this batch
+                    remaining_rows = rows_to_process - processed_count
+                    current_batch_size = min(config.batch_size, remaining_rows)
 
-                # Fetch batch with ORDER BY for consistent ordering (critical for data integrity)
-                batch_query = f"""
-                    SELECT {config.id_column}, {config.text_column}
-                    FROM {config.input_table}
-                    WHERE {config.id_column} > ?
-                    ORDER BY {config.id_column} ASC
-                    LIMIT ?
-                """
+                    # Fetch batch with ORDER BY for consistent ordering (critical for data integrity)
+                    batch_query = f"""
+                        SELECT {config.id_column}, {config.text_column}
+                        FROM {config.input_table}
+                        WHERE {config.id_column} > ?
+                        ORDER BY {config.id_column} ASC
+                        LIMIT ?
+                    """
 
-                batch_data = input_conn.execute(
-                    batch_query,
-                    [last_processed_id, current_batch_size]
-                ).fetchall()
+                    batch_data = input_conn.execute(
+                        batch_query,
+                        [last_processed_id, current_batch_size]
+                    ).fetchall()
 
-                if not batch_data:
-                    logger.info("No more data to process")
-                    break
+                    if not batch_data:
+                        logger.info("No more data to process")
+                        break
 
-                timer.track(f"fetch_batch_{batch_number}")
+                    batch_timer.track("sql_read")
 
-                # Extract IDs and texts (maintain order from query)
-                batch_ids = [row[0] for row in batch_data]
-                batch_texts = [row[1] for row in batch_data]
+                    # Extract IDs and texts (maintain order from query)
+                    batch_ids = [row[0] for row in batch_data]
+                    batch_texts = [row[1] for row in batch_data]
 
-                # Generate embeddings using the provided callback
-                embeddings = embed_callback(batch_texts)
+                    batch_timer.track("processing")
 
-                timer.track(f"model_encode_{batch_number}")
+                    # Generate embeddings using the provided callback
+                    embeddings = embed_callback(batch_texts)
 
-                # Prepare DataFrame for bulk insert
-                # Note: DuckDB will automatically convert list[list[float]] to FLOAT[]
-                results_df = pd.DataFrame({
-                    config.id_column: batch_ids,
-                    config.text_column: batch_texts,
-                    'embedding': embeddings
-                })
+                    batch_timer.track("embedding")
 
-                # Bulk insert using high-performance append() method (Rule #8)
-                output_conn.append(config.output_table, results_df)
+                    # Prepare DataFrame for bulk insert
+                    # Note: DuckDB will automatically convert list[list[float]] to FLOAT[]
+                    results_df = pd.DataFrame({
+                        config.id_column: batch_ids,
+                        config.text_column: batch_texts,
+                        'embedding': embeddings
+                    })
 
-                timer.track(f"bulk_insert_{batch_number}")
+                    # Bulk insert using high-performance append() method (Rule #8)
+                    output_conn.append(config.output_table, results_df)
 
-                # Update progress tracking
-                last_processed_id = batch_ids[-1]  # Last ID from batch (maintains DB order)
-                processed_count += len(batch_data)
+                    batch_timer.track("db_write_bulk")
 
-                # Report progress
-                progress_pct = (processed_count / rows_to_process) * 100
-                logger.info(
-                    f"Batch {batch_number}: Processed {processed_count} / {rows_to_process} "
-                    f"records ({progress_pct:.1f}%) | Last ID: {last_processed_id}"
-                )
+                    # Update progress tracking
+                    last_processed_id = batch_ids[-1]  # Last ID from batch (maintains DB order)
+                    processed_count += len(batch_data)
+
+                    # Report progress
+                    progress_pct = (processed_count / rows_to_process) * 100
+                    logger.info(
+                        f"Batch {batch_number}: Processed {processed_count} / {rows_to_process} "
+                        f"records ({progress_pct:.1f}%) | Last ID: {last_processed_id}"
+                    )
+
+                    # Report detailed timing breakdown
+                    timing_summary = batch_timer.get_timing_summary()
+                    timing_str = ", ".join([
+                        f"{step['step']}={step['duration_ms']/1000:.4f}"
+                        for step in timing_summary
+                    ])
+                    logger.info(f"  {timing_str}")
 
             timer.track("processing_complete")
 
@@ -166,7 +178,9 @@ def process_duckdb(
             logger.info(timing_summary)
 
             # Calculate throughput
-            total_time = sum(step['duration'] for step in timer.steps)
+            # Find the 'total' entry in timing_summary
+            total_time_ms = next((step['duration_ms'] for step in timing_summary if step['step'] == 'total'), 0)
+            total_time = total_time_ms / 1000  # Convert to seconds
             if total_time > 0:
                 throughput = processed_count / total_time
                 logger.info(f"\nThroughput: {throughput:.2f} items/second")
