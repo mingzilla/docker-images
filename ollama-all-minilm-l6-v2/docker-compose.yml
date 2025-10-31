@@ -1,0 +1,22 @@
+services:
+  ollama:
+    image: mingzilla/ollama-all-minilm-l6-v2:1.0.0
+    container_name: ollama-all-minilm-l6-v2
+    ports:
+      - "30101:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
