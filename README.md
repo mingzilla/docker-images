@@ -4,7 +4,7 @@
 
 | Service                 | Type                    | Capability | Description                                 | Dimensions | Note                                                          |
 |-------------------------|-------------------------|------------|---------------------------------------------|------------|---------------------------------------------------------------|
-| api_all-minilm-l6-v2    | Embedding               | CPU only   | Official HuggingFace model all-MiniLM-L6-v2 | 384        |                                                               |
+| api_all-minilm-l6-v2    | Embedding               | CPU or GPU | Official HuggingFace model all-MiniLM-L6-v2 | 384        | Uses cuda/gpu by default, falls back to cpu                   |
 | ollama-all-minilm-l6-v2 | Embedding               | CPU or GPU | Official HuggingFace model all-MiniLM-L6-v2 | 384        | With GPU usage, it seems to be slower than the python version |
 | ollama-nomic-embed      | Embedding               | CPU or GPU | Official nomic-embed-text                   | 768        |                                                               |
 | ollama-embeddinggemma   | Embedding               | CPU or GPU | Official ollama-embeddinggemma              | 128,768    |                                                               |

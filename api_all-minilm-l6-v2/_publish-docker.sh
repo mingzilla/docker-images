@@ -4,7 +4,6 @@
 if [ -z "$1" ]; then
     echo "Error: Version tag is required"
     echo "Usage: ./_publish-docker.sh <version>"
-    echo "Example: ./_publish-docker.sh 1.0.1"
     exit 1
 fi
 

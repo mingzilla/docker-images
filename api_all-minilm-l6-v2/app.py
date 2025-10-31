@@ -72,11 +72,12 @@ def estimate_tokens(text: str) -> int:
 async def lifespan(app: FastAPI):
     global model, tokenizer
     logger.info("Loading sentence-transformers model...")
-    
+
     try:
-        model = SentenceTransformer(MODEL_NAME)
-        logger.info(f"Model loaded successfully on CPU")
-        
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        model = SentenceTransformer(MODEL_NAME, device=device)
+        logger.info(f"Model loaded successfully on {device}")
+
         try:
             tokenizer = tiktoken.get_encoding("cl100k_base")
         except:
@@ -94,7 +95,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="all-MiniLM-L6-v2 Embedding API",
     description="OpenAI-compatible embedding API using sentence-transformers/all-MiniLM-L6-v2",
-    version="1.0.1",
+    version="1.0.2",
     lifespan=lifespan
 )
 

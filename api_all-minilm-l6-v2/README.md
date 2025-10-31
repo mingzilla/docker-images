@@ -88,7 +88,7 @@ For detailed API examples and response formats, see [curl.md](curl.md).
 ./_build-image.sh
 
 # Publish to Docker Hub
-./_publish-docker.sh 1.0.1
+./_publish-docker.sh 1.0.2
 ```
 
 ### Adapting for Other Models
