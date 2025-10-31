@@ -20,7 +20,7 @@ class Config:
         # Validate essential fields
         required_fields = [
             "input_db_path", "output_db_path", "input_table",
-            "id_column", "text_column", "output_table", "batch_size"
+            "id_column", "text_column", "output_table", "batch_size", "total_rows"
         ]
         for field in required_fields:
             if not hasattr(self, field):
@@ -29,3 +29,7 @@ class Config:
         # Ensure batch_size is a positive integer
         if not isinstance(self.batch_size, int) or self.batch_size <= 0:
             raise ValueError("batch_size must be a positive integer.")
+
+        # Ensure total_rows is a positive integer
+        if not isinstance(self.total_rows, int) or self.total_rows <= 0:
+            raise ValueError("total_rows must be a positive integer.")

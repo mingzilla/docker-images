@@ -1,0 +1,10 @@
+{
+  "input_db_path": "input.duckdb",
+  "output_db_path": "output.duckdb",
+  "input_table": "source_texts",
+  "id_column": "id",
+  "text_column": "text",
+  "output_table": "embeddings",
+  "batch_size": 15000,
+  "total_rows": 10000000
+}

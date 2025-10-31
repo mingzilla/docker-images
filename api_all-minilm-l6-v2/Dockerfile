@@ -6,13 +6,20 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
+# Set PYTHONPATH so imports work without src. prefix
+ENV PYTHONPATH=/app/src
+
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy application files
 COPY app.py ./
 COPY benchmark.py ./
+
+# Copy src directory for batch embedding functionality
+COPY src/ /app/src/
 
 EXPOSE 8000
 
