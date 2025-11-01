@@ -6,5 +6,6 @@
   "text_column": "text",
   "output_table": "embeddings",
   "batch_size": 15000,
-  "total_rows": 10000000
+  "total_rows": 10000000,
+  "embedding_dimension": 384
 }

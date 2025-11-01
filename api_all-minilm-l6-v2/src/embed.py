@@ -69,6 +69,7 @@ def main():
     logger.info(f"  Output Table: {config.output_table}")
     logger.info(f"  Batch Size: {config.batch_size}")
     logger.info(f"  Total Rows Limit: {config.total_rows}")
+    logger.info(f"  Embedding Dimension: {config.embedding_dimension}")
 
     # Detect device and load model
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -80,6 +81,17 @@ def main():
     logger.info(f"Loading model: {MODEL_NAME}")
     model = SentenceTransformer(MODEL_NAME, device=device)
     logger.info(f"Model loaded successfully on {device}")
+
+    # Get and log the actual model embedding dimension
+    model_dimension = model.get_sentence_embedding_dimension()
+    logger.info(f"Model embedding dimension: {model_dimension}")
+
+    if model_dimension != config.embedding_dimension:
+        logger.warning(
+            f"WARNING: Config embedding_dimension ({config.embedding_dimension}) "
+            f"does not match model dimension ({model_dimension}). "
+            f"This will cause an error during processing."
+        )
 
     # Define embedding callback function
     # This encapsulates all model-specific logic

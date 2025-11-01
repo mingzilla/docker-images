@@ -129,10 +129,21 @@ def process_duckdb(
                     # Generate embeddings using the provided callback
                     embeddings = embed_callback(batch_texts)
 
+                    # Validate embedding dimension on first batch
+                    if batch_number == 1 and len(embeddings) > 0:
+                        actual_dimension = len(embeddings[0])
+                        if actual_dimension != config.embedding_dimension:
+                            raise ValueError(
+                                f"Embedding dimension mismatch! "
+                                f"Config specifies {config.embedding_dimension} but model returned {actual_dimension}. "
+                                f"Please update embedding_dimension in config.json to {actual_dimension}."
+                            )
+                        logger.info(f"Embedding dimension validated: {actual_dimension}")
+
                     batch_timer.track("embedding")
 
                     # Prepare DataFrame for bulk insert
-                    # Note: DuckDB will automatically convert list[list[float]] to FLOAT[]
+                    # Note: DuckDB will automatically convert list[list[float]] to FLOAT[dimension]
                     results_df = pd.DataFrame({
                         config.id_column: batch_ids,
                         config.text_column: batch_texts,
@@ -247,8 +258,8 @@ def _create_output_table(conn: duckdb.DuckDBPyConnection, config: Config, id_col
     """
     Create output table with VSS-compatible schema.
 
-    Schema: (id_column, text_column, embedding FLOAT[])
-    The FLOAT[] type is compatible with DuckDB's VSS extension for cosine similarity search.
+    Schema: (id_column, text_column, embedding FLOAT[dimension])
+    The FLOAT[dimension] type is compatible with DuckDB's VSS extension for cosine similarity search.
     The id_column type matches the source table's type.
     """
 
@@ -256,7 +267,7 @@ def _create_output_table(conn: duckdb.DuckDBPyConnection, config: Config, id_col
         CREATE TABLE {config.output_table} (
             {config.id_column} {id_column_type},
             {config.text_column} TEXT,
-            embedding FLOAT[]
+            embedding FLOAT[{config.embedding_dimension}]
         )
     """
 
