@@ -3,7 +3,6 @@ import pandas as pd
 import os
 import logging
 from typing import Callable
-from config import Config
 from shared_utils.external.operation_logging.simple_timer import SimplerTimer
 import json
 
@@ -249,7 +248,7 @@ def process_duckdb(
             output_conn.close()
 
 
-def _validate_input_table(conn: duckdb.DuckDBPyConnection, config: Config) -> None:
+def _validate_input_table(conn: duckdb.DuckDBPyConnection, config: EmbedConfig) -> None:
     """Validate that input table and required columns exist."""
 
     # Check if table exists
@@ -276,7 +275,7 @@ def _validate_input_table(conn: duckdb.DuckDBPyConnection, config: Config) -> No
         raise ValueError(f"Text column '{config.text_column}' not found in table '{config.input_table}'")
 
 
-def _get_last_processed_id(conn: duckdb.DuckDBPyConnection, config: Config, id_column_type: str):
+def _get_last_processed_id(conn: duckdb.DuckDBPyConnection, config: EmbedConfig, id_column_type: str):
     """
     Get the last processed ID from output table for resumeability.
     Returns None if table doesn't exist, or the max ID value.
@@ -300,7 +299,7 @@ def _get_last_processed_id(conn: duckdb.DuckDBPyConnection, config: Config, id_c
     return result[0] if result[0] is not None else _get_initial_value_for_type(id_column_type)
 
 
-def _create_output_table(conn: duckdb.DuckDBPyConnection, config: Config, id_column_type: str) -> None:
+def _create_output_table(conn: duckdb.DuckDBPyConnection, config: EmbedConfig, id_column_type: str) -> None:
     """
     Create output table with VSS-compatible schema.
 

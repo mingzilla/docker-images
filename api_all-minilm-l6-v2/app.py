@@ -95,7 +95,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="all-MiniLM-L6-v2 Embedding API",
     description="OpenAI-compatible embedding API using sentence-transformers/all-MiniLM-L6-v2",
-    version="1.0.3",
+    version="1.0.4",
     lifespan=lifespan
 )
 
