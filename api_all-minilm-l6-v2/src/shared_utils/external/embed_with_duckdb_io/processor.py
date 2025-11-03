@@ -90,7 +90,7 @@ def process_duckdb(
             raise FileNotFoundError(f"Input database not found: {config.input_db_path}")
 
         # Connect to databases
-        input_conn = duckdb.connect(database=config.input_db_path, read_only=True)
+        input_conn = duckdb.connect(database=config.input_db_path, read_only=False) # If set to True, it prevents the output file from being the same as the input file
         output_conn = duckdb.connect(database=config.output_db_path, read_only=False)
 
         timer.track("initialization")
