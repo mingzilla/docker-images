@@ -20,7 +20,7 @@ import torch
 import logging
 from sentence_transformers import SentenceTransformer
 
-from shared_utils.external.embed_with_duckdb_io.processor import process_duckdb, EmbedConfig
+from shared_utils.external.embed_with_duckdb_io.processor import process_duckdb, EmbeddingConfig
 
 
 # Model configuration
@@ -45,7 +45,7 @@ def main():
     logger.info(f"Loading configuration from: {config_path}")
 
     try:
-        config = EmbedConfig(config_path)
+        config = EmbeddingConfig(config_path)
     except FileNotFoundError:
         logger.error(f"Configuration file not found: {config_path}")
         logger.error("Please ensure config.json is in the mounted data directory")

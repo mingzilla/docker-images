@@ -7,7 +7,7 @@ from shared_utils.external.operation_logging.simple_timer import SimplerTimer
 import json
 
 
-class EmbedConfig:
+class EmbeddingConfig:
     def __init__(self, config_path: str = 'config.json'):
         self.config_path = config_path
         self._load_config()
@@ -53,7 +53,7 @@ class EmbedConfig:
 
 
 def process_duckdb(
-        config: EmbedConfig,
+        config: EmbeddingConfig,
         embed_callback: Callable[[list[str]], list[list[float]]]
 ) -> None:
     """
@@ -248,7 +248,7 @@ def process_duckdb(
             output_conn.close()
 
 
-def _validate_input_table(conn: duckdb.DuckDBPyConnection, config: EmbedConfig) -> None:
+def _validate_input_table(conn: duckdb.DuckDBPyConnection, config: EmbeddingConfig) -> None:
     """Validate that input table and required columns exist."""
 
     # Check if table exists
@@ -275,7 +275,7 @@ def _validate_input_table(conn: duckdb.DuckDBPyConnection, config: EmbedConfig) 
         raise ValueError(f"Text column '{config.text_column}' not found in table '{config.input_table}'")
 
 
-def _get_last_processed_id(conn: duckdb.DuckDBPyConnection, config: EmbedConfig, id_column_type: str):
+def _get_last_processed_id(conn: duckdb.DuckDBPyConnection, config: EmbeddingConfig, id_column_type: str):
     """
     Get the last processed ID from output table for resumeability.
     Returns None if table doesn't exist, or the max ID value.
@@ -299,7 +299,7 @@ def _get_last_processed_id(conn: duckdb.DuckDBPyConnection, config: EmbedConfig,
     return result[0] if result[0] is not None else _get_initial_value_for_type(id_column_type)
 
 
-def _create_output_table(conn: duckdb.DuckDBPyConnection, config: EmbedConfig, id_column_type: str) -> None:
+def _create_output_table(conn: duckdb.DuckDBPyConnection, config: EmbeddingConfig, id_column_type: str) -> None:
     """
     Create output table with VSS-compatible schema.
 
