@@ -7,5 +7,6 @@
   "output_table": "embeddings",
   "batch_size": 15000,
   "total_rows": 10000000,
-  "embedding_dimension": 384
+  "embedding_dimension": 384,
+  "enable_vss_index": false
 }

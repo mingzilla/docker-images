@@ -57,12 +57,12 @@ class EmbeddingProcessor:
         pass
 
     @staticmethod
-    def process_duckdb(
+    def process_embedding(
             config: EmbeddingConfig,
             embed_callback: Callable[[list[str]], list[list[float]]]
     ) -> None:
         """
-        Process a DuckDB file by reading text data, applying an embedding transformation,
+        Process embeddings by reading text data from DuckDB, applying an embedding transformation,
         and writing results to an output DuckDB file.
 
         This function is model-agnostic and reusable across different embedding models.
@@ -251,6 +251,96 @@ class EmbeddingProcessor:
             finally:
                 input_conn.close()
                 output_conn.close()
+
+    @staticmethod
+    def create_vss_index(config: EmbeddingConfig) -> None:
+        """
+        Create VSS (Vector Similarity Search) index on the embedding column.
+
+        Args:
+            config: Configuration object with output database path and table name
+
+        Raises:
+            Exception: If VSS extension installation or index creation fails
+        """
+        logger = logging.getLogger(__name__)
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+        with SimplerTimer("VSS Index Creation") as timer:
+            logger.info("=" * 80)
+            logger.info("Creating VSS index...")
+            logger.info("=" * 80)
+
+            output_conn = duckdb.connect(database=config.output_db_path, read_only=False)
+
+            try:
+                output_conn.execute("INSTALL vss;")
+                output_conn.execute("LOAD vss;")
+                output_conn.execute("SET hnsw_enable_experimental_persistence = true;")
+                output_conn.execute(f"CREATE INDEX idx_embeddings ON {config.output_table} USING HNSW (embedding);")
+
+                timer.track("index_created")
+
+                logger.info(f"VSS index created on {config.output_table}.embedding")
+
+                # Get timing summary
+                timing_summary = timer.get_timing_summary()
+                logger.info("\nVSS Index Creation Performance:")
+                logger.info(timing_summary)
+                logger.info("=" * 80)
+
+            finally:
+                output_conn.close()
+
+    @staticmethod
+    def process_duckdb(
+            config: EmbeddingConfig,
+            embed_callback: Callable[[list[str]], list[list[float]]]
+    ) -> None:
+        """
+        Orchestrate the complete processing pipeline: embedding generation and optional VSS indexing.
+
+        This method coordinates the overall workflow by:
+        1. Processing embeddings using process_embedding()
+        2. Creating VSS index if enabled in config
+
+        Args:
+            config: Configuration object with database paths, table names, columns, and batch settings
+            embed_callback: Function that takes list[str] and returns list[list[float]]
+
+        Raises:
+            FileNotFoundError: If input database file doesn't exist
+            ValueError: If input table or columns don't exist
+        """
+        logger = logging.getLogger(__name__)
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+        with SimplerTimer("Overall Processing") as timer:
+            # Step 1: Generate embeddings
+            EmbeddingProcessor.process_embedding(config, embed_callback)
+            timer.track("embedding")
+
+            # Step 2: Create VSS index if enabled
+            if config.enable_vss_index:
+                EmbeddingProcessor.create_vss_index(config)
+                timer.track("vss_indexing")
+
+            # Report overall time tracking summary
+            timing_summary = timer.get_timing_summary()
+
+            logger.info("\n" + "=" * 80)
+            logger.info("OVERALL TIME TRACKING")
+            logger.info("=" * 80)
+
+            for step in timing_summary:
+                if step['step'] == 'embedding':
+                    logger.info(f"Overall time spent for embedding: {step['duration_ms']/1000:.2f}s ({step['duration_ms']:.0f}ms)")
+                elif step['step'] == 'vss_indexing':
+                    logger.info(f"Overall time spent for adding index: {step['duration_ms']/1000:.2f}s ({step['duration_ms']:.0f}ms)")
+                elif step['step'] == 'total':
+                    logger.info(f"Overall time spent (total): {step['duration_ms']/1000:.2f}s ({step['duration_ms']:.0f}ms)")
+
+            logger.info("=" * 80)
 
 
     @staticmethod
