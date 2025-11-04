@@ -145,6 +145,7 @@ To create a version with a different sentence-transformers model:
 
 ## History
 
+- 1.0.5 - Added enable_vss_index flag to allow duckdb vss search
 - 1.0.4 - Added command line fast processing
 
 ## License
