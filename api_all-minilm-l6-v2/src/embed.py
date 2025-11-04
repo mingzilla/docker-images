@@ -20,7 +20,7 @@ import torch
 import logging
 from sentence_transformers import SentenceTransformer
 
-from shared_utils.external.embed_with_duckdb_io.processor import process_duckdb, EmbeddingConfig
+from shared_utils.external.embed_with_duckdb_io.embedding_processor import EmbeddingProcessor, EmbeddingConfig
 
 
 # Model configuration
@@ -115,7 +115,7 @@ def main():
     # Delegate to the reusable DuckDB processor
     logger.info("Starting DuckDB processing...")
     try:
-        process_duckdb(config, embed_texts_callback)
+        EmbeddingProcessor.process_duckdb(config, embed_texts_callback)
         logger.info("Batch embedding process completed successfully!")
     except Exception as e:
         logger.error(f"Error during processing: {e}")
