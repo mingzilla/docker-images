@@ -8,7 +8,7 @@ import json
 
 
 class EmbeddingConfig:
-    def __init__(self, config_path: str = 'config.json'):
+    def __init__(self, config_path: str = 'embedding_config.json'):
         self.config_path = config_path
         self._load_config()
 
@@ -186,7 +186,7 @@ class EmbeddingProcessor:
                                 raise ValueError(
                                     f"Embedding dimension mismatch! "
                                     f"Config specifies {config.embedding_dimension} but model returned {actual_dimension}. "
-                                    f"Please update embedding_dimension in config.json to {actual_dimension}."
+                                    f"Please update embedding_dimension in embedding_config.json to {actual_dimension}."
                                 )
                             logger.info(f"Embedding dimension validated: {actual_dimension}")
 

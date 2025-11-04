@@ -11,8 +11,8 @@ Usage:
     python -m embed
 
 Requirements:
-    - config.json must exist in /app/data/ (mounted volume in Docker)
-    - Input DuckDB file must exist at the path specified in config.json
+    - embedding_config.json must exist in /app/data/ (mounted volume in Docker)
+    - Input DuckDB file must exist at the path specified in embedding_config.json
 """
 
 import os
@@ -41,14 +41,14 @@ def main():
     logger.info("=" * 80)
 
     # Load configuration from environment variable
-    config_path = os.getenv("CONFIG_PATH", "/app/data/config.json")
+    config_path = os.getenv("CONFIG_PATH", "/app/data/embedding_config.json")
     logger.info(f"Loading configuration from: {config_path}")
 
     try:
         config = EmbeddingConfig(config_path)
     except FileNotFoundError:
         logger.error(f"Configuration file not found: {config_path}")
-        logger.error("Please ensure config.json is in the mounted data directory")
+        logger.error("Please ensure embedding_config.json is in the mounted data directory")
         raise
     except ValueError as e:
         logger.error(f"Configuration validation error: {e}")
