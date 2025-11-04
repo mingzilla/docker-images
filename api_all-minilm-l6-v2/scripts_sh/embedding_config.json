@@ -1,9 +1,9 @@
 {
   "input_db_path": "input.duckdb",
-  "output_db_path": "output.duckdb",
   "input_table": "companies",
   "id_column": "id",
   "text_column": "name",
+  "output_db_path": "output.duckdb",
   "output_table": "embeddings",
   "batch_size": 15000,
   "total_rows": 10000000,
