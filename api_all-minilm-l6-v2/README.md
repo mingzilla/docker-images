@@ -143,6 +143,10 @@ To create a version with a different sentence-transformers model:
 - **Model Size**: ~90MB
 - **Performance**: Excellent balance of speed, size, and quality
 
+## History
+
+- 1.0.4 - Added command line fast processing
+
 ## License
 
 This project provides a Docker wrapper around the sentence-transformers library and all-MiniLM-L6-v2 model. Please refer to the respective licenses:
