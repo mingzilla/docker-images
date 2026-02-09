@@ -17,3 +17,7 @@ fi
 if [ "$1" == "log_llama3" ]; then
     docker::view_logs "vllm-llama-nvfp4"
 fi
+
+if [ "$1" == "save_llama3" ]; then
+    docker::save_as_tar "vllm-llama3.2-nvfp4:local" "vllm-llama3.2-nvfp4.tar"
+fi

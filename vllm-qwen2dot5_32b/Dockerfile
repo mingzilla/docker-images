@@ -41,10 +41,12 @@ EXPOSE 8000
 
 WORKDIR /app
 
-CMD ["vllm", "serve", "/app/models/Qwen2.5-32B-Instruct-NVFP4", \
-     "--quantization", "nvfp4", \
-     "--dtype", "auto", \
-     "--max-model-len", "8192", \
-     "--gpu-memory-utilization", "0.99", \
-     "--host", "0.0.0.0", \
-     "--port", "8000"]
+ENV MAX_MODEL_LEN=8192
+
+CMD vllm serve /app/models/Qwen2.5-32B-Instruct-NVFP4 \
+    --quantization nvfp4 \
+    --dtype auto \
+    --max-model-len ${MAX_MODEL_LEN} \
+    --gpu-memory-utilization 0.99 \
+    --host 0.0.0.0 \
+    --port 8000

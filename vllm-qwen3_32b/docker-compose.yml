@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: vllm-qwen3-nvfp4:local
     container_name: vllm-qwen3-nvfp4
     runtime: nvidia
     ports:
@@ -10,7 +11,7 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=0
       - CUDA_VISIBLE_DEVICES=0
-      - HF_HOME=/root/.cache/huggingface
+      - MAX_MODEL_LEN=8192
     deploy:
       resources:
         reservations:

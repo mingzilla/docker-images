@@ -17,3 +17,7 @@ fi
 if [ "$1" == "log_qwen3" ]; then
     docker::view_logs "vllm-qwen3-nvfp4"
 fi
+
+if [ "$1" == "save_qwen3" ]; then
+    docker::save_as_tar "vllm-qwen3-nvfp4:local" "vllm-qwen3-nvfp4.tar"
+fi

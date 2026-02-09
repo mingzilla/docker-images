@@ -26,6 +26,24 @@ function docker::view_logs() {
     docker logs -f "$model_name"
 }
 
+function docker::save_as_tar() {
+    local image_name="$1"
+    local output_file="$2"
+
+    echo "Saving Docker image: $image_name"
+    echo "Output file: $output_file"
+
+    docker save "$image_name" -o "$output_file"
+
+    if [ -f "$output_file" ]; then
+        local file_size=$(du -h "$output_file" | cut -f1)
+        echo "✓ Image saved successfully: $output_file ($file_size)"
+    else
+        echo "✗ Failed to save image"
+        exit 1
+    fi
+}
+
 function help::show() {
     local model_name="$1"
 
@@ -34,8 +52,10 @@ function help::show() {
     echo "Available commands:"
     echo "  curl_$model_name      Test $model_name"
     echo "  log_$model_name       View logs for $model_name"
+    echo "  save_$model_name      Save Docker image as tar file"
     echo ""
     echo "Examples:"
     echo "  $0 curl_$model_name"
     echo "  $0 log_$model_name"
+    echo "  $0 save_$model_name"
 }
