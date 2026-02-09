@@ -25,13 +25,22 @@ WORKDIR /app/models
 # Download Qwen3 model
 RUN python3 -c "from huggingface_hub import snapshot_download; snapshot_download('nvidia/Qwen3-32B-NVFP4', local_dir='/app/models/Qwen3-32B-NVFP4', local_dir_use_symlinks=False)"
 
-# Build vLLM v0.15.1 from source
+# Rebuild Flash Attention from source for PyTorch 25.02 compatibility
 WORKDIR /workspace
-RUN git clone --branch v0.15.1 --depth 1 https://github.com/vllm-project/vllm.git && \
-    cd vllm && \
+RUN pip uninstall -y flash-attn && \
+    MAX_JOBS=4 pip install flash-attn --no-build-isolation
+
+# Build vLLM v0.15.1 from source
+RUN git clone --branch v0.15.1 --depth 1 https://github.com/vllm-project/vllm.git
+
+RUN cd vllm && \
     pip install -r requirements/build.txt && \
     pip install setuptools_scm && \
+    pip install "numpy<2.0" && \
     MAX_JOBS=4 pip install -e . --no-build-isolation
+
+# Fix numpy version compatibility
+RUN pip install "numpy<2.0" --force-reinstall
 
 # Clean up
 RUN rm -rf /root/.cache/pip /workspace/vllm/build /tmp/*
@@ -47,6 +56,6 @@ CMD vllm serve /app/models/Qwen3-32B-NVFP4 \
     --quantization nvfp4 \
     --dtype auto \
     --max-model-len ${MAX_MODEL_LEN} \
-    --gpu-memory-utilization 0.99 \
+    --gpu-memory-utilization 0.90 \
     --host 0.0.0.0 \
     --port 8000
