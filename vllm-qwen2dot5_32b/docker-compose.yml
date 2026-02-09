@@ -1,6 +1,8 @@
 services:
   vllm-qwen2_5:
-    image: vllm/vllm-openai:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: vllm-qwen2.5-nvfp4
     runtime: nvidia
     ports:
@@ -8,22 +10,13 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=0
       - CUDA_VISIBLE_DEVICES=0
-    volumes:
-      - ~/.cache/huggingface:/root/.cache/huggingface
-    command: >
-      vllm serve Qwen2.5-32B-Instruct-NVFP4
-      --quantization nvfp4
-      --dtype auto
-      --max-model-len 8192
-      --gpu-memory-utilization 0.99
-      --host 0.0.0.0
-      --port 8000
+      - HF_HOME=/root/.cache/huggingface
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               count: all
-              capabilities: [gpu]
+              capabilities: [ gpu ]
     ipc: host
     restart: unless-stopped
