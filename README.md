@@ -13,6 +13,17 @@
 
 Refer to [embedding-model-selection.md](_docs/embedding-model-selection.md) for embedding model selection.
 
+## vllm models
+
+| Feature                              | llama3.2  | qwen2.5   | qwen3     |
+  |--------------------------------------|-----------|-----------|-----------|
+| vLLM version                         | v0.15.1 ✅ | v0.15.1 ✅ | v0.15.1 ✅ |
+| Blackwell support                    | sm_120 ✅  | sm_120 ✅  | sm_120 ✅  |
+| MAX_MODEL_LEN configurable           | ✅         | ✅         | ✅         |
+| VLLM_FLASH_ATTN_VERSION configurable | ✅         | ✅         | ✅         |
+| Build from source                    | ✅         | ✅         | ✅         |
+| Save to tar support                  | ✅         | ✅         | ✅         |
+
 ## Upgrade Ollama
 
 1. Dockerfile
