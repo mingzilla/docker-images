@@ -1,0 +1,29 @@
+services:
+  vllm-llama3_2:
+    image: vllm/vllm-openai:latest
+    container_name: vllm-llama-nvfp4
+    runtime: nvidia
+    ports:
+      - "30200:8000"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+      - CUDA_VISIBLE_DEVICES=0
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    command: >
+      vllm serve neuralmagic/Llama-3.2-3B-Instruct-FP4
+      --quantization nvfp4
+      --dtype auto
+      --max-model-len 8192
+      --gpu-memory-utilization 0.99
+      --host 0.0.0.0
+      --port 8000
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    ipc: host
+    restart: unless-stopped
