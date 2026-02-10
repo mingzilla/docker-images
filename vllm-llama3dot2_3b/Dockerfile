@@ -19,12 +19,6 @@ ENV CUDA_HOME=/usr/local/cuda
 ENV PATH="/usr/local/bin:$CUDA_HOME/bin:$PATH"
 ENV HF_HOME=/app/models
 
-# Create model directory
-WORKDIR /app/models
-
-# Download model using Python module (avoids CLI PATH issues)
-RUN python3 -c "from huggingface_hub import snapshot_download; snapshot_download('ISTA-DASLab/Llama-3.2-3B-Instruct-FPQuant-QAT-NVFP4', local_dir='/app/models/Llama-3.2-3B-Instruct-NVFP4', local_dir_use_symlinks=False)"
-
 # Build vLLM v0.15.1 from source
 WORKDIR /workspace
 RUN git clone --branch v0.15.1 --depth 1 https://github.com/vllm-project/vllm.git
@@ -42,8 +36,12 @@ RUN pip uninstall -y flash-attn && \
 # Fix numpy version compatibility (flash-attn may reinstall numpy)
 RUN pip install "numpy<2.0" --force-reinstall
 
-# Clean up
+# Clean up build cache
 RUN rm -rf /root/.cache/pip /workspace/vllm/build /tmp/*
+
+# Download model
+WORKDIR /app/models
+RUN python3 -c "from huggingface_hub import snapshot_download; snapshot_download('ISTA-DASLab/Llama-3.2-3B-Instruct-FPQuant-QAT-NVFP4', local_dir='/app/models/Llama-3.2-3B-Instruct-NVFP4', local_dir_use_symlinks=False)"
 
 # Expose port
 EXPOSE 8000
