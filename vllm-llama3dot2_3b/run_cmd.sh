@@ -11,7 +11,7 @@ if [ $# -eq 0 ]; then
 fi
 
 if [ "$1" == "curl_llama3" ]; then
-    curl::test_model "30200" "neuralmagic/Llama-3.2-3B-Instruct-FP4"
+    curl::test_model "30200" "ISTA-DASLab/Llama-3.2-3B-Instruct-FPQuant-QAT-NVFP4"
 fi
 
 if [ "$1" == "log_llama3" ]; then
