@@ -45,17 +45,15 @@ function docker::save_as_tar() {
 }
 
 function help::show() {
-    local model_name="$1"
-
     echo "Usage: $0 <command>"
     echo ""
     echo "Available commands:"
-    echo "  curl_$model_name      Test $model_name"
-    echo "  log_$model_name       View logs for $model_name"
-    echo "  save_$model_name      Save Docker image as tar file"
+    echo "  curl        Test the model"
+    echo "  log         View container logs"
+    echo "  save        Save Docker image as tar file"
     echo ""
     echo "Examples:"
-    echo "  $0 curl_$model_name"
-    echo "  $0 log_$model_name"
-    echo "  $0 save_$model_name"
+    echo "  $0 curl"
+    echo "  $0 log"
+    echo "  $0 save"
 }

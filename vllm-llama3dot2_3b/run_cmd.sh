@@ -6,18 +6,18 @@ source ../_common/common_cmd.sh
 ##############################################################
 
 if [ $# -eq 0 ]; then
-    help::show "llama3"
+    help::show
     exit 1
 fi
 
-if [ "$1" == "curl_llama3" ]; then
+if [ "$1" == "curl" ]; then
     curl::test_model "30200" "ISTA-DASLab/Llama-3.2-3B-Instruct-FPQuant-QAT-NVFP4"
 fi
 
-if [ "$1" == "log_llama3" ]; then
+if [ "$1" == "log" ]; then
     docker::view_logs "vllm-llama3.2-nvfp4"
 fi
 
-if [ "$1" == "save_llama3" ]; then
+if [ "$1" == "save" ]; then
     docker::save_as_tar "vllm-llama3.2-nvfp4:local" "vllm-llama3.2-nvfp4.tar"
 fi
