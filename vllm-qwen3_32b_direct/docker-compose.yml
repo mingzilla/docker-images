@@ -1,12 +1,12 @@
 services:
-  vllm-qwen3:
+  vllm-qwen3-direct:
     build:
       context: .
       dockerfile: Dockerfile
-    image: vllm-qwen3-nvfp4:local
-    container_name: vllm-qwen3-nvfp4
+    image: vllm-qwen3-direct:local
+    container_name: vllm-qwen3-direct
     ports:
-      - "30200:8000"
+      - "30202:8000"
     environment:
       - NVIDIA_VISIBLE_DEVICES=0
       - CUDA_VISIBLE_DEVICES=0
