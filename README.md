@@ -13,16 +13,38 @@
 
 Refer to [embedding-model-selection.md](_docs/embedding-model-selection.md) for embedding model selection.
 
-## vllm models
+## vllm nvpf4 models
 
-| Feature                              | llama3.2  | qwen2.5   | qwen3     |
-  |--------------------------------------|-----------|-----------|-----------|
-| vLLM version                         | v0.15.1 ✅ | v0.15.1 ✅ | v0.15.1 ✅ |
-| Blackwell support                    | sm_120 ✅  | sm_120 ✅  | sm_120 ✅  |
-| MAX_MODEL_LEN configurable           | ✅         | ✅         | ✅         |
-| VLLM_FLASH_ATTN_VERSION configurable | ✅         | ✅         | ✅         |
-| Build from source                    | ✅         | ✅         | ✅         |
-| Save to tar support                  | ✅         | ✅         | ✅         |
+### How NVPF4 works
+
+- Prefill: Processes the full input prompt in parallel, compute-intensive, high GPU utilization
+- Decode: Autoregressive token generation, memory bandwidth-bound, lower GPU utilization
+
+```text
+Prefill:  ████████████████████  Compute-bound (matmuls, FLOPs maxed)
+          GPU: ~100% utilization
+          "Using all the CUDA cores"
+
+Decode:   ░░░░░░░░░░░░░░░░░░░░  Memory bandwidth-bound
+          GPU: ~10-30% utilization  
+          "Waiting on VRAM → cache transfers, compute idle"
+
+
+ Prefill     Decode
+ [AAAAAA] -> [AA    ]
+                |  |
+                BB |
+                   CC
+```
+
+
+```text
+Prefill:  [A] → [B] → [C]  (sequential, even with NVFP4)
+Decode:   [A1+B1] → [A2+B2] → [A3+B3]  (batched together)
+```
+
+
+
 
 ## Upgrade Ollama
 

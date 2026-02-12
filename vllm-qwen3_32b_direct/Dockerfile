@@ -17,13 +17,17 @@ EXPOSE 8000
 
 WORKDIR /app
 
-ENV MAX_MODEL_LEN=2048
+ENV MAX_MODEL_LEN=8192
+ENV SWAP_SPACE=60
 
 ENTRYPOINT []
 CMD vllm serve /app/models/Qwen3-32B-NVFP4 \
+    --served-model-name nvidia/Qwen3-32B-NVFP4 \
     --quantization nvfp4 \
     --dtype auto \
     --max-model-len ${MAX_MODEL_LEN} \
-    --gpu-memory-utilization 0.97 \
+    --gpu-memory-utilization 0.92 \
+    --swap-space ${SWAP_SPACE} \
+    --enforce-eager \
     --host 0.0.0.0 \
     --port 8000

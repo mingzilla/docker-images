@@ -55,6 +55,8 @@ CMD vllm serve /app/models/Qwen3-32B-NVFP4 \
     --quantization nvfp4 \
     --dtype auto \
     --max-model-len ${MAX_MODEL_LEN} \
-    --gpu-memory-utilization 0.85 \
+    --gpu-memory-utilization 0.93 \
+    --swap-space 60 \
+    --enforce-eager \
     --host 0.0.0.0 \
     --port 8000
