@@ -10,7 +10,7 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=0
       - CUDA_VISIBLE_DEVICES=0
-      - MAX_MODEL_LEN=512
+      - MAX_MODEL_LEN=8192
       - VLLM_FLASH_ATTN_VERSION=2
     deploy:
       resources:

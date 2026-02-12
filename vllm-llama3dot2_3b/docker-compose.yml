@@ -5,7 +5,6 @@ services:
       dockerfile: Dockerfile
     image: vllm-llama3.2-nvfp4:local
     container_name: vllm-llama3.2-nvfp4
-    runtime: nvidia
     ports:
       - "30200:8000"
     environment:
