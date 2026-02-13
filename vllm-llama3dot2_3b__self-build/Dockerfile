@@ -49,6 +49,7 @@ EXPOSE 8000
 WORKDIR /app
 
 ENV MAX_MODEL_LEN=8192
+ENV GPU_MEMORY_UTILIZATION=0.80
 
 CMD vllm serve /app/models/Llama-3.2-3B-Instruct-NVFP4 \
     --served-model-name ISTA-DASLab/Llama-3.2-3B-Instruct-FPQuant-QAT-NVFP4 \
@@ -56,6 +57,6 @@ CMD vllm serve /app/models/Llama-3.2-3B-Instruct-NVFP4 \
     --allow-deprecated-quantization \
     --dtype auto \
     --max-model-len ${MAX_MODEL_LEN} \
-    --gpu-memory-utilization 0.90 \
+    --gpu-memory-utilization ${GPU_MEMORY_UTILIZATION} \
     --host 0.0.0.0 \
     --port 8000

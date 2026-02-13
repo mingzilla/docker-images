@@ -1,10 +1,12 @@
 services:
-  vllm-llama3_2-nvfp4:
+  vllm-llama3_2:
     build:
       context: .
       dockerfile: Dockerfile
-    image: vllm-llama3_2-nvfp4:local
-    container_name: vllm-llama3_2-nvfp4
+      args:
+        HF_TOKEN: ${HF_TOKEN}
+    image: vllm-llama3_2:local
+    container_name: vllm-llama3_2
     ports:
       - "30200:8000"
     environment:

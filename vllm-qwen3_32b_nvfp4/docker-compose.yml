@@ -12,6 +12,7 @@ services:
       - CUDA_VISIBLE_DEVICES=0
       - MAX_MODEL_LEN=512
       - VLLM_FLASH_ATTN_VERSION=2
+      - GPU_MEMORY_UTILIZATION=0.80
     deploy:
       resources:
         reservations:
