@@ -153,13 +153,10 @@ vllm-llama3dot2_3b$ docker logs vllm-llama3.2-nvfp4 2>&1 | grep -E "(Loading mod
 - Decode: Autoregressive token generation, memory bandwidth-bound, lower GPU utilization
 
 ```text
-Prefill:  ████████████████████  Compute-bound (matmuls, FLOPs maxed)
-          GPU: ~100% utilization
-          "Using all the CUDA cores"
-
-Decode:   ░░░░░░░░░░░░░░░░░░░░  Memory bandwidth-bound
-          GPU: ~10-30% utilization  
-          "Waiting on VRAM → cache transfers, compute idle"
+Prefill:  [A] → [B] → [C]  (sequential, compute-bound, NVFP4 helps little)
+Decode:   [A1+B1+C1...]    (batched, bandwidth-bound, NVFP4 helps massively)
+          ↑
+          4× more tokens per memory fetch
 
 
  Prefill     Decode
