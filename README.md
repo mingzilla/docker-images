@@ -74,11 +74,11 @@ Estimated performance by Kimi and ChatGPT: H20=2x5090, H100=5x5090
 
 ## Performance
 
-|               | 60 items speed | avg speed per item |
-|---------------|----------------|--------------------|
-| vllm single   | 180s           | 3s                 |
-| vllm batching | 45s            | 0.75s              |
-| ollama single | 90s            | 1.5s               |
+|               | 60 items speed | avg speed per item | nvfp4 |
+|---------------|----------------|--------------------|-------|
+| vllm single   | 180s           | 3s                 | yes   |
+| vllm batching | 45s            | 0.75s              | yes   |
+| ollama single | 90s            | 1.5s               | no    |
 
 ### How NVFP4 works
 
