@@ -3,7 +3,7 @@ services:
     image: mingzilla/ollama-llama3:1.0.1
     container_name: ollama-llama3
     ports:
-      - "30201:11434"
+      - "40201:11434"
     environment:
       - OLLAMA_HOST=0.0.0.0
     restart: unless-stopped
