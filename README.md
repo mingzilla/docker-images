@@ -13,6 +13,15 @@
 
 Refer to [embedding-model-selection.md](_docs/embedding-model-selection.md) for embedding model selection.
 
+| Service Type | Service/Image Name                    | Dims | Model Name          | DEV Port | PROD Port |
+|--------------|---------------------------------------|------|---------------------|----------|-----------|
+| Embedding    | mingzilla/api_all-minilm-l6-v2:1.0.1  | 384  | all-MiniLM-L6-v2    | 30101    | 40101     |
+| Embedding    | mingzilla/ollama-nomic-embed:1.0.3    | 768  | nomic-embed-text    | 30102    | 40102     |
+| Embedding    | mingzilla/ollama-embeddinggemma:1.0.0 | 128  | embeddinggemma:300m | 30103    | 40103     |
+| Completions  | mingzilla/ollama-llama3:1.0.1         |      |                     | 30201    | 40201     |
+| Completions  | ollama-qwen2pt5_32b (container)       |      | qwen2.5:32b         | 30205    | 40205     |
+| Reranking    | (example)                             |      |                     | 30301    | 40301     |
+
 ## Prompt and Model for Text Extraction
 
 ```text
@@ -110,7 +119,6 @@ FlashAttention is an algorithmic optimization for the attention mechanism in Tra
 | **FlashAttention v1** | 2022 | Tiling + online softmax                 | ~25% (A100)     | 3-4× faster               |
 | **FlashAttention v2** | 2023 | Better parallelism, deferred softmax    | 50-70% (A100)   | **2× v1**                 |
 | **FlashAttention v3** | 2024 | Asynchronous execution, FP8/FP4 support | **75% (H100)**  | **2× v2, 1.2 PFLOPS FP8** |
-
 
 ## Upgrade Ollama
 

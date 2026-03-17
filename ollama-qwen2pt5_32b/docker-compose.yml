@@ -1,9 +1,9 @@
 services:
   ollama:
     image: ollama/ollama:0.11.5 # DO NOT upgrade, this version uses 100% GPU
-    container_name: ollama-test
+    container_name: ollama-qwen2pt5_32b
     ports:
-      - "11434:11434"
+      - "30205:11434"
     environment:
       - OLLAMA_HOST=0.0.0.0
     restart: unless-stopped
