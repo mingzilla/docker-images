@@ -5,7 +5,7 @@ function curl::test_model() {
     local model_name="$1"
     echo "============================== $model_name ===================================="
 
-    curl -X POST http://localhost:11434/v1/chat/completions \
+    curl -X POST http://localhost:30205/v1/chat/completions \
     -H "Content-Type: application/json" \
     -d "$(jq -n --arg model "$model_name" '{
         model: $model,
