@@ -1,14 +1,12 @@
 services:
   ollama:
     image: ollama/ollama:0.20.3
-    container_name: ollama-claude-code-dev
+    container_name: ollama-qwen3pt5_9b
     ports:
       - "40221:11434"
     environment:
       - OLLAMA_HOST=0.0.0.0
       - OLLAMA_CONTEXT_LENGTH=65536
-    volumes:
-      - ./docker-volumes/models:/root/.ollama/models
     restart: unless-stopped
     deploy:
       resources:

@@ -1,87 +1,47 @@
 # ollama-claude-code
 
-Run Claude Code CLI against a local Ollama server with the qwen3.5 model.
+Configure Claude Code CLI to use a local Ollama model instead of Anthropic's API.
 
-## How it works
+## Prerequisites
 
-Your local `claude` CLI connects to an Ollama Docker container via environment variables:
+- Ollama running with a model (e.g. `ollama-qwen3pt5_9b/` in this repo)
+- Claude Code CLI installed on host
+- Run `sudo ./install-requirements.sh` for web tools (jq, ddgr, duckdb)
+
+## Usage
+
+```bash
+# Interactive mode
+./claude-qwen.sh
+
+# Single-shot mode
+./claude-qwen.sh -p "your prompt"
+```
+
+This sets the env vars that redirect Claude Code to Ollama:
 
 ```bash
 ANTHROPIC_AUTH_TOKEN=ollama
 ANTHROPIC_BASE_URL=http://localhost:40221
 ANTHROPIC_API_KEY=""
-claude -p "your prompt" --model qwen3.5
+claude --model qwen3.5
 ```
 
-## Building the image
+## Web tools
 
-The goal is to bake the model into a Docker image so it can run without downloading anything.
+Built-in WebSearch and WebFetch do not work with Ollama. This project includes a `tool__web` skill (in `.claude/skills/tool__web/`) that provides shell-based alternatives:
 
-### Why `docker cp` is needed
+- **Web search**: `ddgr` (DuckDuckGo CLI)
+- **Web fetch**: `curl` + HTML text cleaner
 
-`docker commit` only captures a container's **writable layer** — the container's own filesystem. Anything mounted via a **bind mount** or **named volume** is excluded from the commit.
-
-This means:
-
-1. Start a container **with no volume**
-2. `docker cp` the model files from `./docker-volumes/models/` into the container's filesystem
-3. `docker commit` the container into an image
-
-The local `./docker-volumes/models/` directory acts as a cache. Without it, you'd have to `ollama pull` the model every time you rebuild (~30 min download).
-
-### Workflow
-
-**Step 1: Dev and test** — use `docker-compose.dev.yml`
-
-```bash
-docker compose -f docker-compose.dev.yml up -d
-# Pull the model (first time only — stored in ./docker-volumes/models/)
-docker exec ollama-claude-code-dev ollama pull qwen3.5
-# Test
-./docker-test.sh
-```
-
-This runs base Ollama with a bind mount to `./docker-volumes/models/`. The model is cached locally so you never re-download.
-
-**Step 2: Build the image** — use `docker-build.sh`
-
-```bash
-docker compose -f docker-compose.dev.yml down
-./docker-build.sh
-```
-
-When you're happy with the model, build a standalone image. The script reuses the cached models from `./docker-volumes/models/` and commits as `mingzilla/ollama-claude-code-qwen3pt5:1.0.0`.
-
-**Step 3: Verify the image** — use `docker-compose.yml`
-
-```bash
-docker compose up -d
-./docker-test.sh
-docker compose down
-```
-
-Start the baked image and verify it works. No volumes needed — the model is inside the image.
-
-**Step 4: Save (optional)** — use `docker-save.sh`
-
-```bash
-./docker-save.sh
-```
-
-Export the image to a `.tar` file for portability.
-
-### Scripts
-
-| Script | Purpose |
-|---|---|
-| `docker-build.sh` | Build the image from cached models in `./docker-volumes/models/` |
-| `docker-test.sh` | Test the running container with `claude -p "say hello"` |
-| `docker-save.sh` | Export the image to a `.tar` file |
+The `CLAUDE.md` file instructs Claude Code to use these automatically.
 
 ## Files
 
-| File | Description |
-|---|---|
-| `docker-compose.yml` | Runs the baked image (no volumes) |
-| `docker-compose.dev.yml` | Dev: runs base Ollama with bind-mounted models from `./docker-volumes/models/` |
-| `docker-volumes/models/` | Cached model files (6.2 GB for qwen3.5 9B) |
+| File                        | Purpose                                                         |
+|-----------------------------|-----------------------------------------------------------------|
+| `claude-qwen3pt5_9b.sh`     | Wrapper script to run Claude Code against Ollama                |
+| `CLAUDE.md`                 | Rules for Claude Code (use web skill, avoid built-in web tools) |
+| `install-requirements.sh`   | Install jq, ddgr, duckdb                                        |
+| `.claude/skills/tool__web/` | Web search and fetch skill                                      |
+| `_docs/`                    | Conversation logs and verification results                      |
