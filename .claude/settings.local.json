@@ -21,7 +21,11 @@
       "WebFetch(domain:example.com)",
       "Bash(python3:*)",
       "Bash(bash:*)",
-      "Bash(/llm:*)"
+      "Bash(/llm:*)",
+      "Bash(duckdb:*)",
+      "Bash(sort -k2 -nr)",
+      "Bash(awk '{total += $2} {types[$NF] += $1} END {for \\(t in types\\) print types[t] \" | \" t}')",
+      "Bash(sort -k1 -nr)"
     ]
   }
 }
