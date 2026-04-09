@@ -1,0 +1,28 @@
+services:
+  ollama:
+    image: ollama/ollama:0.20.3
+    container_name: ollama-claude-code-dev
+    ports:
+      - "40221:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_CONTEXT_LENGTH=65536
+    volumes:
+      - ollama-claude-code-dev__models:/root/.ollama
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD-SHELL", "echo > /dev/tcp/localhost/11434"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  ollama-claude-code-dev__models:

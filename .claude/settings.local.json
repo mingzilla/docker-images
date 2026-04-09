@@ -6,7 +6,15 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:docs.vllm.ai)",
       "WebFetch(domain:hub.docker.com)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(curl -sL --max-time 30 \"https://docs.ollama.com/integrations/claude-code\")",
+      "Bash(curl -sL --max-time 30 \"https://hub.docker.com/r/ollama/ollama/tags\")",
+      "Bash(curl:*)",
+      "WebFetch(domain:docs.ollama.com)",
+      "WebFetch(domain:ollama.com)",
+      "Bash(python3 -c ':*)",
+      "WebFetch(domain:apxml.com)",
+      "Bash(chmod +x:*)"
     ]
   }
 }
