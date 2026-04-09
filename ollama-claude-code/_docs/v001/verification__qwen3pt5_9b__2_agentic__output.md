@@ -1,3 +1,18 @@
+## Results: qwen3.5 9B (q4_K_M) — 2026-04-09
+
+| Test area             | Works? | Notes                                                                                            |
+|-----------------------|--------|--------------------------------------------------------------------------------------------------|
+| Multi-step chaining   | Y      | DuckDB JOIN across 4 tables with differently-named keys, JSON export. Recovered from jq failure. |
+| Large output handling | Y      | Recursively counted lines per file type                                                          |
+| Instruction following | Y      | Reformatted to markdown with exact header structure                                              |
+| Error recovery        | Y      | Created missing file with "recovered"                                                            |
+| Code correctness      | Y      | Average headcount: 251.0                                                                         |
+| Complex editing       | Y      | Updated JSON port, added print statement                                                         |
+
+**Summary**: 6/6 working. The 9B model handles multi-step agentic workflows well, including schema discovery, error recovery, and chained tool calls.
+
+## Full Output
+
 ```text
 ❯ let's test your ability with ollama-claude-code/_docs/v001/verification__qwen3pt5_9b__2_agentic.md
 
