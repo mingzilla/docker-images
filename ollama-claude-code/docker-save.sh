@@ -2,8 +2,8 @@
 cd "$(dirname "$0")"
 set -e
 
-IMAGE_NAME="mingzilla/ollama-claude-code:1.0.0"
-OUTPUT_FILE="mingzilla__ollama-claude-code__1.0.0.tar"
+IMAGE_NAME="mingzilla/ollama-claude-code-qwen3pt5:1.0.0"
+OUTPUT_FILE="mingzilla__ollama-claude-code-qwen3pt5__1.0.0.tar"
 
 echo "==> Saving $IMAGE_NAME to $OUTPUT_FILE"
 docker save -o "$OUTPUT_FILE" "$IMAGE_NAME"

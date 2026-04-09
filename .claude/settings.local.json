@@ -14,7 +14,10 @@
       "WebFetch(domain:ollama.com)",
       "Bash(python3 -c ':*)",
       "WebFetch(domain:apxml.com)",
-      "Bash(chmod +x:*)"
+      "Bash(chmod +x:*)",
+      "Bash(docker exec ollama-claude-code-dev:*)",
+      "Bash(docker cp:*)",
+      "Bash(python3 -m json.tool)"
     ]
   }
 }

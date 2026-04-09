@@ -8,7 +8,7 @@ services:
       - OLLAMA_HOST=0.0.0.0
       - OLLAMA_CONTEXT_LENGTH=65536
     volumes:
-      - ollama-claude-code-dev__models:/root/.ollama
+      - ./docker-volumes/models:/root/.ollama/models
     restart: unless-stopped
     deploy:
       resources:
@@ -23,6 +23,3 @@ services:
       timeout: 5s
       retries: 3
       start_period: 5s
-
-volumes:
-  ollama-claude-code-dev__models:

@@ -1,6 +1,6 @@
 services:
   ollama:
-    image: mingzilla/ollama-claude-code:1.0.0
+    image: mingzilla/ollama-claude-code-qwen3pt5:1.0.0
     container_name: ollama-claude-code
     ports:
       - "40221:11434"
