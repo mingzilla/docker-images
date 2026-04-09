@@ -29,3 +29,6 @@ Newest entries at bottom. Never delete entries.
 - [Ollama/LLM] qwen3.5 9B passed 12/12 capability tests including multi-step DuckDB joins, parallel agents, error recovery, and web tools via skill. Sufficient for `claude -p` agentic workflows.
 - [Ollama/LLM] CLAUDE.md must give explicit shell commands for the model to use — a 9B model won't follow "read the skill file" indirection reliably. Direct commands like `web_search.sh "query"` work.
 - [Ollama/LLM] `claude -p` (non-interactive) is the primary use case. Each invocation is independent — no conversation history reprocessing, so 64K context is generous for single-shot prompts.
+- [Ollama/LLM] `claude -p` with `--dangerously-skip-permissions` is required for headless batch processing — otherwise tool call approvals block execution.
+- [Ollama/LLM] qwen3.5 9B can hallucinate tool completion — it claims "file written" without actually calling the write tool. Observed on first attempt at transcript conversion; worked on retry. Reliability improves with simpler/shorter prompts.
+- [Ollama/LLM] Transcript-to-human quality comparison: 9B produces usable output but is more verbose, uses tables instead of ASCII diagrams, and includes filler content (e.g. sponsor sections). Sufficient for structured extractive tasks, not for high-polish output.
