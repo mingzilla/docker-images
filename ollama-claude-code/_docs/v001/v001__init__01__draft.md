@@ -356,3 +356,12 @@ let's do the implementation, and we write v001__init__02__solution.md after we p
   Then test with ./docker-test-dev.sh.
   
 
+❯ by the way i have claude code on my machine, is it using claude code from my machine, and use the ollama docker container when my claude code tries to use a model?
+
+● Yes.
+
+❯ oh, so this is basically enable my claude code to be able to use ollama
+  this is not a ollama container that bundles claude code inside
+
+● Exactly. The Ollama container is just a model server — it serves the qwen3.5 model via an Anthropic-compatible API. Your existing Claude Code installation on your machine
+  connects to it.
