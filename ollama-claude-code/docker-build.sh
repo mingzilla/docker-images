@@ -26,7 +26,7 @@ echo "==> Ollama is ready."
 
 if [ -d "$MODELS_DIR" ]; then
     echo "==> Copying cached models into container..."
-    docker cp "$MODELS_DIR" "$CONTAINER_NAME":/root/.ollama/models
+    docker cp "$MODELS_DIR/." "$CONTAINER_NAME":/root/.ollama/models
 else
     echo "==> No cached models found, pulling model: $MODEL"
     docker exec "$CONTAINER_NAME" ollama pull "$MODEL"
@@ -42,4 +42,4 @@ echo "==> Committing container as $IMAGE_NAME"
 docker commit "$CONTAINER_NAME" "$IMAGE_NAME"
 
 echo "==> Done. Image ready: $IMAGE_NAME"
-echo "    Test with: ./docker-test-dev.sh"
+echo "    Test with: docker compose up -d && ./docker-test.sh"
