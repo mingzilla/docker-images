@@ -25,7 +25,10 @@
       "Bash(duckdb:*)",
       "Bash(sort -k2 -nr)",
       "Bash(awk '{total += $2} {types[$NF] += $1} END {for \\(t in types\\) print types[t] \" | \" t}')",
-      "Bash(sort -k1 -nr)"
+      "Bash(sort -k1 -nr)",
+      "Bash(.claude/skills/tool__web/scripts/web_search.sh:*)",
+      "Bash(/mnt/e/code/docker-images/ollama-claude-code/.claude/skills/tool__web/scripts/web_search.sh:*)",
+      "Bash(/mnt/e/code/docker-images/ollama-claude-code/.claude/skills/tool__web/scripts/web_fetch.sh:*)"
     ]
   }
 }
