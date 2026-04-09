@@ -204,3 +204,155 @@ alias claude-local='ANTHROPIC_AUTH_TOKEN=ollama ANTHROPIC_BASE_URL=http://localh
   The committed image lives in your local Docker store after step 1, so you can test it immediately without saving to .tar first. The .tar is just for archiving/portability.
 
   Ready to write the plan to ollama-claude-code/_docs/v001/v001__init__02__plan.md whenever you give the go-ahead.
+  
+
+let's do the implementation, and we write v001__init__02__solution.md after we prove that everything works
+
+● Let me implement everything. I'll read the current files first, then make all changes.
+
+  Read 3 files, listed 1 directory (ctrl+o to expand)
+
+● Good — you've already updated the ports and fixed the port allocation. Now I need to:
+  1. Pin ollama version + add context length in both compose files
+  2. Set the prod image to the baked image
+  3. Create docker-build.sh and docker-save.sh
+
+● Now create the build and save scripts.
+
+● Bash(chmod +x /mnt/e/code/docker-images/ollama-claude-code/docker-build.sh /mnt/e/code/docker-images/ollama-claude-code/docker-save.sh)
+  ⎿  Done
+
+● Let me verify the final state of all files.
+
+  Read 4 files (ctrl+o to expand)
+
+● Everything looks good. Ready to test — run from the ollama-claude-code/ directory:
+
+  # Step 1: Build the image (pulls ollama 0.20.3, downloads qwen3.5, commits)
+  cd /mnt/e/code/docker-images/ollama-claude-code
+  ./docker-build.sh
+
+  # Step 2: Test it
+  docker compose up -d
+  # Wait a moment, then:
+  ANTHROPIC_AUTH_TOKEN=ollama ANTHROPIC_BASE_URL=http://localhost:40221 ANTHROPIC_API_KEY="" claude -p "say hello" --model qwen3.5
+
+  # Step 3: Once working, save the tar
+  docker compose down
+  ./docker-save.sh
+
+  Want to kick off docker-build.sh now?
+
+✻ Churned for 52s
+
+❯ do we just add `cd "$(dirname "$0")"` to every .sh file to make sure we can run it from anywhere?
+
+● Good call. Let me add that to both scripts.
+
+
+● Done. Both scripts will now work from any directory.
+
+❯ could you create a docker-test-dev.sh file, just so that we have the command in it to run the test version of this docker?
+
+
+● Bash(chmod +x /mnt/e/code/docker-images/ollama-claude-code/docker-test-dev.sh)
+  ⎿  Done
+
+● Done. It runs the baked image with --rm so the test container cleans up automatically when stopped.
+
+❯ i'm confused about what this does and how we use it.
+  do you mean we run the file, and then we run `claude -p` as a http rest api call?
+
+● You're right to question it. The script does two things mixed together:
+
+  1. Starts the ollama server container
+  2. Prints a claude -p command for you to run manually in another terminal
+
+  That's awkward. It should probably just run the test end-to-end. Let me simplify — the script should:
+
+  1. Start the container
+  2. Run the claude -p test command
+  3. Stop the container
+
+  Read 1 file (ctrl+o to expand)
+
+● Now it's self-contained: start container, run claude -p "say hello" against it, stop and clean up. One command, no manual steps.
+
+  To clarify what's happening under the hood: claude -p is the Claude Code CLI — when you set ANTHROPIC_BASE_URL to the Ollama server, it makes HTTP API calls to Ollama's
+  Anthropic-compatible endpoint instead of Anthropic's servers. So yes, it's REST API calls, but the claude CLI handles that for you.
+
+❯ let's come back to this later.
+
+● The health check in the script uses curl inside the container, but the ollama image likely doesn't have curl installed. Let me check.
+
+● Bash(docker exec ollama-claude-code-dev which curl 2>&1; docker exec ollama-claude-code-dev curl -sf http://localhost:11434/api/version 2>&1)
+  ⎿  Error: Exit code 127
+     OCI runtime exec failed: exec failed: unable to start container process: exec: "curl": executable file not found in $PATH
+
+● No curl in the container. The build script should check from the host side instead, since the port is exposed.
+
+  Read 1 file (ctrl+o to expand)
+
+● Also need to fix the same issue in the docker-compose healthcheck — it uses curl inside the container too. And the test script.
+
+● Bash(docker exec ollama-claude-code-dev which wget 2>&1; docker exec ollama-claude-code-dev ls /bin/busybox 2>&1)
+  ⎿  Error: Exit code 2
+     ls: cannot access '/bin/busybox': No such file or directory
+
+● Bash(docker exec ollama-claude-code-dev bash -c 'echo > /dev/tcp/localhost/11434 && echo ok' 2>&1)
+  ⎿  ok
+
+● Good — bash tcp check works. Let me fix the healthcheck in both compose files.
+
+● Now let's stop the stuck container and re-run the build.
+
+● Bash(cd /mnt/e/code/docker-images/ollama-claude-code && docker compose -f docker-compose.dev.yml down 2>&1)
+  ⎿  Interrupted · What should Claude do instead?
+
+❯ do we want `docker-compose.dev.yml down` or `docker-compose.dev.yml stop`? or do i just ctrl+c?
+  everything works, it's just the testing part fail
+
+● stop — it preserves the container so we can still docker commit it. down would remove the container and we'd lose the pulled model.
+
+  So:
+
+  docker compose -f docker-compose.dev.yml stop
+
+  Then you can continue the build manually:
+
+  cd /mnt/e/code/docker-images/ollama-claude-code
+  docker commit ollama-claude-code-dev mingzilla/ollama-claude-code:1.0.0
+  docker compose -f docker-compose.dev.yml down
+
+❯ sounds like it's better to volume out the gguf model for docker-compose.dev.yml, right?
+  when we run docker-compose.yml, we don't need volumes, but dev we do. right?
+
+● Exactly. The dev container's job is to pull models — if it gets down'd accidentally, you'd have to re-download. A volume protects against that. The prod image has the model
+  baked in, so no volume needed there.
+
+● Done. Now docker compose -f docker-compose.dev.yml down is safe — the model stays in the volume. But this means docker-build.sh needs a different approach for docker commit,
+  since the model lives in the volume, not in the container's filesystem.
+
+  Let me update docker-build.sh to copy the model from the volume into the container before committing.
+
+● The cp -r → rm → mv trick copies the model data from the volume mount into the actual container layer, so docker commit captures it. Without this, the volume data wouldn't be
+  included in the committed image.
+
+❯ so what do we do now then?
+
+● The current dev container still has the model pulled (from your earlier run). So we just need to finish the build from where it left off:
+
+  cd /mnt/e/code/docker-images/ollama-claude-code
+
+  # Stop the running dev container (preserves it for commit)
+  docker compose -f docker-compose.dev.yml stop
+
+  # Commit it as the image
+  docker commit ollama-claude-code-dev mingzilla/ollama-claude-code:1.0.0
+
+  # Clean up
+  docker compose -f docker-compose.dev.yml down
+
+  Then test with ./docker-test-dev.sh.
+  
+
