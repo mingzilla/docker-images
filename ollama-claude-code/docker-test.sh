@@ -16,7 +16,7 @@ docker::check_container_running
 
 START=$(date +%s)
 
-ANTHROPIC_AUTH_TOKEN=ollama ANTHROPIC_BASE_URL=http://localhost:40221 ANTHROPIC_API_KEY="" claude -p "say hello" --model qwen3.5
+./claude-qwen.sh -p "say hello"
 
 END=$(date +%s)
 echo ""
