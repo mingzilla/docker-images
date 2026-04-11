@@ -2,7 +2,7 @@
 
 All temp files go in `_tmp/` under the current directory. Create it if it doesn't exist.
 
-I want to test if you can do multi-step agentic tasks, because this is using ollama with qwen model in claude code. Please do each test one by one, tick or cross the boxes when done.
+I want to test if you can do multi-step agentic tasks, because this is using ollama with gemma4 model in claude code. Please do each test one by one, tick or cross the boxes when done.
 
 | Test area             | Test prompt                                                                                                                                                                                                                                                                                                                                                                                  | Works? |
 |-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------|
@@ -15,13 +15,13 @@ I want to test if you can do multi-step agentic tasks, because this is using oll
 
 ---
 
-## Results: qwen3.5 9B (q4_K_M) — YYYY-MM-DD
+## Results: gemma4 e4b — YYYY-MM-DD
 
-| Test area             | Works? | Notes                                    |
-|-----------------------|--------|------------------------------------------|
-| Multi-step chaining   | Y      | DuckDB JOIN across 4 tables, JSON export |
-| Large output handling | Y      | Recursively counted lines per file       |
-| Instruction following | Y      | Reformat to markdown with exact header   |
-| Error recovery        | Y      | Created missing file with "recovered"    |
-| Code correctness      | Y      | Average headcount: 251.0                 |
-| Complex editing       | Y      | Updated JSON port, added print statement |
+| Test area             | Works? | Notes |
+|-----------------------|--------|-------|
+| Multi-step chaining   |        |       |
+| Large output handling |        |       |
+| Instruction following |        |       |
+| Error recovery        |        |       |
+| Code correctness      |        |       |
+| Complex editing       |        |       |
