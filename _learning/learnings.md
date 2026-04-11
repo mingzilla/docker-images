@@ -32,3 +32,10 @@ Newest entries at bottom. Never delete entries.
 - [Ollama/LLM] `claude -p` with `--dangerously-skip-permissions` is required for headless batch processing — otherwise tool call approvals block execution.
 - [Ollama/LLM] qwen3.5 9B can hallucinate tool completion — it claims "file written" without actually calling the write tool. Observed on first attempt at transcript conversion; worked on retry. Reliability improves with simpler/shorter prompts.
 - [Ollama/LLM] Transcript-to-human quality comparison: 9B produces usable output but is more verbose, uses tables instead of ASCII diagrams, and includes filler content (e.g. sponsor sections). Sufficient for structured extractive tasks, not for high-polish output.
+
+### 2026-04-11
+
+- [Ollama/LLM] Gemma 4 variants on Ollama: e2b (2.3B, ~4GB VRAM, 128K ctx), e4b (4.5B, ~6GB VRAM, 128K ctx, default), 26b MoE (3.8B active, ~15-18GB, 256K ctx), 31b dense (30.7B, ~24GB, 256K ctx). Default `gemma4` resolves to e4b (9.6GB download). Supports text + image input (multimodal).
+- [Ollama/LLM] `ollama pull` downloads model weights to disk only — no VRAM used. Model loads into VRAM on first inference request. Safe to pull while GPU is busy with other tasks.
+- [Project conventions] New model server: `ollama-gemma4/` on port 40204. Follows same structure as `ollama-qwen3pt5_9b/`: docker-compose.yml + stop_clean_start.sh + test_models.sh + remove_models.sh.
+- [User preferences] User wants concise readme.md files for docker-images projects: title + one-line description (include port), spec/variant tables (params, VRAM, context, download size), and a short usage section listing available scripts. No lengthy documentation.

@@ -1,7 +1,8 @@
 # Action: Apply Learning
 
-When user says "update learnings" or "let's update our learning", append a dated entry
-to `_learning/learnings.md` with insights from the current session.
+When user says "update learnings" or "let's update our learning":
+1. First, evolve the "What to capture" section below — compare against what you're about to save. Add/refine categories if new types of insight emerged. Remove categories that are no longer relevant. Do not read any files — reason only from what's already in session context.
+2. Then append a dated entry to `_learning/learnings.md` with insights from the current session.
 
 ## What to capture
 
