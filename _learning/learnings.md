@@ -39,3 +39,9 @@ Newest entries at bottom. Never delete entries.
 - [Ollama/LLM] `ollama pull` downloads model weights to disk only — no VRAM used. Model loads into VRAM on first inference request. Safe to pull while GPU is busy with other tasks.
 - [Project conventions] New model server: `ollama-gemma4/` on port 40204. Follows same structure as `ollama-qwen3pt5_9b/`: docker-compose.yml + stop_clean_start.sh + test_models.sh + remove_models.sh.
 - [User preferences] User wants concise readme.md files for docker-images projects: title + one-line description (include port), spec/variant tables (params, VRAM, context, download size), and a short usage section listing available scripts. No lengthy documentation.
+
+### 2026-04-12
+
+- [Project conventions] Each model gets its own project directory and docker-compose file (e.g. `ollama-qwen3pt5_9b/`, `ollama-gemma4/`). Reasons: (1) independent lifecycle — stable vs experimental models don't risk each other, (2) clean archival — move whole directory to `_archive/` when obsolete instead of editing a shared compose file, (3) independent volumes — `clean.sh` in one project can't nuke another model's data. Unification happens at the orchestration layer (`models.yaml` in `tool__local_claude_code`), not at the infrastructure layer.
+- [Project conventions] `ollama-gemma4/` supports two services in one compose file: `ollama-e4b` (port 40204) and `ollama-26b` (port 40205). Named volumes persist models. Scripts (`start.sh`, `pull.sh`, `stop.sh`, `clean.sh`, `test_models.sh`, `remove_models.sh`) all take `e4b|26b|all` as argument. `pull.sh` is separate from `start.sh` to avoid re-downloading models.
+- [Project conventions] `_archive/` directory exists for directories that haven't been used in months. Move entire project directories there rather than deleting.
