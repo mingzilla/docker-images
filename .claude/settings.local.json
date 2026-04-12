@@ -29,7 +29,8 @@
       "Bash(.claude/skills/tool__web/scripts/web_search.sh:*)",
       "Bash(/mnt/e/code/docker-images/ollama-claude-code/.claude/skills/tool__web/scripts/web_search.sh:*)",
       "Bash(/mnt/e/code/docker-images/ollama-claude-code/.claude/skills/tool__web/scripts/web_fetch.sh:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Read(//mnt/e/code/**)"
     ]
   }
 }
