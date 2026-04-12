@@ -1,6 +1,6 @@
 # ollama-gemma4
 
-Ollama container running Google's Gemma 4 model on port **40204**.
+Ollama containers running Google's Gemma 4 models. Two services: **e4b** (port 40204) and **26b** (port 40205).
 
 ## Model Variants
 
@@ -45,13 +45,25 @@ Terms:
 
 ## Usage
 
+All scripts take `e4b`, `26b`, or `all` as argument. Named volumes persist models across restarts.
+
 ```bash
-# Start fresh (pulls model automatically)
-./stop_clean_start.sh
+# Start a service
+# docker compose up -d ollama-e4b
+./start.sh e4b
 
-# Test the model
-./test_models.sh
+# Pull model (first time only, requires service running)
+./pull.sh e4b
 
-# Remove model weights
-./remove_models.sh
+# Test inference
+./test_models.sh e4b
+
+# Stop (models preserved)
+./stop.sh e4b
+
+# Remove model weights from volume
+./remove_models.sh e4b
+
+# Nuclear: wipe containers + volumes
+./clean.sh
 ```

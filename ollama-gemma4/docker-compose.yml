@@ -1,9 +1,11 @@
 services:
-  ollama:
+  ollama-e4b:
     image: ollama/ollama:0.20.3
-    container_name: ollama-gemma4
+    container_name: ollama-gemma4-e4b
     ports:
       - "40204:11434"
+    volumes:
+      - ollama-gemma4-e4b:/root/.ollama
     environment:
       - OLLAMA_HOST=0.0.0.0
       - OLLAMA_CONTEXT_LENGTH=65536
@@ -21,3 +23,32 @@ services:
       timeout: 5s
       retries: 3
       start_period: 5s
+
+  ollama-26b:
+    image: ollama/ollama:0.20.3
+    container_name: ollama-gemma4-26b
+    ports:
+      - "40205:11434"
+    volumes:
+      - ollama-gemma4-26b:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_CONTEXT_LENGTH=65536
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD-SHELL", "echo > /dev/tcp/localhost/11434"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  ollama-gemma4-e4b:
+  ollama-gemma4-26b:

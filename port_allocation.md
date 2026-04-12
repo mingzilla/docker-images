@@ -11,7 +11,8 @@ Note: for llm friendly create a fixed value table like the below:
 | Completions  | mingzilla/ollama-llama3:1.0.1              | 30201    | 40201     |
 | Completions  | Qwen2.5-1.5B-Instruct                      | 30202    | 40202     |
 | Completions  | google/gemma-2-2b-it                       | 30203    | 40203     |
-| Completions  | google/gemma4                              | 30204    | 40204     |
+| Completions  | google/gemma4:e4b                          | 30204    | 40204     |
+| Completions  | google/gemma4:26b                          | 30205    | 40205     |
 | Completions  | vllm neuralmagic/Llama-3.2-3B-Instruct-FP4 | 30211    | 40211     |
 | Completions  | vllm Qwen2.5-32B-Instruct-NVFP4            | 30212    | 40212     |
 | Completions  | vllm nvidia/Qwen3-32B-NVFP4                | 30213    | 40213     |
