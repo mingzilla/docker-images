@@ -1,8 +1,9 @@
 # Action: Apply Learning
 
 When user says "update learnings" or "let's update our learning":
-1. First, evolve the "What to capture" section below — compare against what you're about to save. Add/refine categories if new types of insight emerged. Remove categories that are no longer relevant. Do not read any files — reason only from what's already in session context.
-2. Then append a dated entry to `_learning/learnings.md` with insights from the current session.
+1. Read `/mnt/e/code/_notes/ai-agents/.claude/skills/system__manage_learnings/rule__self_evolving.md`, then continue
+2. Apply the self-evolving step to the "What to capture" section below
+3. Apply the saving step to `_learning/learnings.md`
 
 ## What to capture
 
@@ -13,18 +14,3 @@ When user says "update learnings" or "let's update our learning":
 
 Only capture what's useful for future sessions. Skip anything obvious or already documented
 in CLAUDE.md or other project/skill files.
-
-## Entry format
-
-```markdown
-### YYYY-MM-DD
-
-- [category] learning text
-```
-
-## Rules
-
-- Append to bottom of `_learning/learnings.md`, never delete existing entries
-- One entry per session (may contain multiple bullet points)
-- Use only what is already in session context — no re-reads to decide what to save
-- If nothing worth capturing, say so and skip
