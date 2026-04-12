@@ -1,5 +1,7 @@
 # ollama-gemma4
 
+**This is nowhere compared to ollama-qwen3pt5_9b**
+
 Ollama containers running Google's Gemma 4 models. Two services: **e4b** (port 40204) and **26b** (port 40205).
 
 ## Model Variants
