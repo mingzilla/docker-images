@@ -30,7 +30,9 @@
       "Bash(/mnt/e/code/docker-images/ollama-claude-code/.claude/skills/tool__web/scripts/web_search.sh:*)",
       "Bash(/mnt/e/code/docker-images/ollama-claude-code/.claude/skills/tool__web/scripts/web_fetch.sh:*)",
       "Bash(ls:*)",
-      "Read(//mnt/e/code/**)"
+      "Read(//mnt/e/code/**)",
+      "Bash(pip3 install:*)",
+      "Bash(pip install:*)"
     ]
   }
 }

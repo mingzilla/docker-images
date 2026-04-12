@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:example.com)",
+      "Read(//usr/bin/**)",
+      "Bash(python3:*)"
+    ]
+  }
+}

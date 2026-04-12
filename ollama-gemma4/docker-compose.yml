@@ -8,7 +8,7 @@ services:
       - ollama-gemma4-e4b:/root/.ollama
     environment:
       - OLLAMA_HOST=0.0.0.0
-      - OLLAMA_CONTEXT_LENGTH=65536
+      - OLLAMA_CONTEXT_LENGTH=131072
     restart: unless-stopped
     deploy:
       resources:
@@ -33,7 +33,7 @@ services:
       - ollama-gemma4-26b:/root/.ollama
     environment:
       - OLLAMA_HOST=0.0.0.0
-      - OLLAMA_CONTEXT_LENGTH=65536
+      - OLLAMA_CONTEXT_LENGTH=131072
     restart: unless-stopped
     deploy:
       resources:

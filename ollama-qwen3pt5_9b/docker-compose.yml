@@ -6,7 +6,7 @@ services:
       - "40221:11434"
     environment:
       - OLLAMA_HOST=0.0.0.0
-      - OLLAMA_CONTEXT_LENGTH=65536
+      - OLLAMA_CONTEXT_LENGTH=131072
     restart: unless-stopped
     deploy:
       resources:
