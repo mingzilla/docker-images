@@ -24,6 +24,13 @@ Check https://www.canirun.ai/device/rtx-5090-laptop?q=gemma+4
 | Gemma 4 31B IT     | Gemma  | 5d ago | 17.4 GB | 73%   | 256K ctx | ~36 tok/s  | Decent      | 61/100 |
 | Gemma 4 31B        | Gemma  | 5d ago | 17.4 GB | 73%   | 256K ctx | ~36 tok/s  | Decent      | 61/100 |
 
+Terms:
+
+- E4B - Effective Params - 4 Billions
+- A4B - Active Params of a MoE model - 4 Billions
+- IT - Industrial Tuned to follow human instructions ()
+- non-IT - Base model (just the knowledge, not good for coding)
+
 ## Default Model Specs (e4b)
 
 | Spec           | Value                     |
