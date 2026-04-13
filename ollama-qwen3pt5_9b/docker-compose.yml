@@ -4,6 +4,8 @@ services:
     container_name: ollama-qwen3pt5_9b
     ports:
       - "40221:11434"
+    volumes:
+      - ollama-qwen3pt5_9b:/root/.ollama
     environment:
       - OLLAMA_HOST=0.0.0.0
       - OLLAMA_CONTEXT_LENGTH=131072
@@ -21,3 +23,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 5s
+
+volumes:
+  ollama-qwen3pt5_9b:

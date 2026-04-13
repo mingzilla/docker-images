@@ -48,3 +48,8 @@ Newest entries at bottom. Never delete entries.
 - [User preferences] Shell script functions must always use `namespace::function_name` convention (e.g. `ollama::rm`, `run::usage`, `curl::test_model`). Never use bare function names like `usage()` or `start_if_needed()`.
 - [Project conventions] Model verification results live with the infrastructure project that owns the model, not with the skill that runs the tests. E.g. `ollama-gemma4/_verification/gemma4_26b__1_basic.md`. The skill (`tool__local_claude_code`) owns the templates; the model project stores results.
 - [Ollama/LLM] `tool__local_claude_code` skill now has a `models.yaml` registry with `enabled` flag per model, tier-based selection (light/heavy), and auto-start of containers. `run.sh` supports `--model`, `--tier`, or auto mode. `setup.sh` pulls all enabled models upfront.
+
+### 2026-04-13
+
+- [Ollama/LLM] gemma4 models (e4b and 26b) failed Claude Code compatibility testing. e4b is much slower than qwen3.5 9b and cannot finish agentic workflows. 26b is very slow on basic tests and won't complete agentic tasks at all. qwen3.5 9b remains the only approved model — it fires sub-agents proactively, runs fast, and completes all tests correctly.
+- [Project conventions] Rejected models go to `models_archive.yaml` in `tool__local_claude_code` with `rejected` date and `reason`. Active models stay in `models.yaml`. Clear separation: tested-and-rejected vs available.

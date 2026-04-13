@@ -4,7 +4,7 @@ set -e
 
 function curl::test_model() {
     local model_name="$1"
-    echo "============================== $model_name ===================================="
+    echo "============================== $model_name (port 40221) ===================================="
 
     curl -X POST http://localhost:40221/v1/chat/completions \
     -H "Content-Type: application/json" \
