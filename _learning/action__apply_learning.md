@@ -11,6 +11,7 @@ When user says "update learnings" or "let's update our learning":
 - **Project conventions** — naming conventions (e.g. mingzilla/ prefix, qwen3pt5 style), port allocation scheme, file structure patterns
 - **User preferences** — how the user likes to work (script-driven workflows, draft docs for conversation logging, separation of dev/prod concerns)
 - **Ollama/LLM** — model configuration, context window sizing, VRAM considerations, Ollama API compatibility notes
+- **Skill integration** — how docker-images projects connect to ai-agents skills (models.yaml, verification setup, CLAUDE.md generation)
 
 Only capture what's useful for future sessions. Skip anything obvious or already documented
 in CLAUDE.md or other project/skill files.
