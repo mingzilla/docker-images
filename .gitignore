@@ -211,4 +211,4 @@ __marimo__/
 .idea/
 *.tar
 # External skills symlink
-.claude/skills
+.claude/skills__central
