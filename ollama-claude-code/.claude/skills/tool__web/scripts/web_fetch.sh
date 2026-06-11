@@ -9,4 +9,6 @@ fi
 
 HTML=$(curl -sL "$URL")
 
-python3 "$SCRIPT_DIR/text_cleaner.py" <<< "$HTML"
+# clean via the cleaner's static method (n-gram pass off); always emit cleaned
+# bytes even when the quality filter rejects.
+python3 -c "import sys; sys.path.insert(0, '$SCRIPT_DIR'); from text_cleaner import CompanyTextCleaner; c, s = CompanyTextCleaner.clean_text_without_ngram_dedup(sys.stdin.read()); print(c if c is not None else s['cleaned_text_if_rejected'])" <<< "$HTML"
