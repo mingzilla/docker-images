@@ -101,4 +101,6 @@ def clean_text(text, n_gram_min_phrase_words=8, n_gram_repeat_threshold=3, quali
 
 
 if __name__ == '__main__':
-    clean_text(sys.stdin.read())
+    args = [a for a in sys.argv[1:] if not a.startswith('-')]
+    n_gram_threshold = 10**9 if '--no-ngrams' in sys.argv else 3
+    clean_text(sys.stdin.read(), n_gram_repeat_threshold=n_gram_threshold)
