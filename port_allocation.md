@@ -18,3 +18,4 @@ Note: for llm friendly create a fixed value table like the below:
 | Completions  | vllm nvidia/Qwen3-32B-NVFP4                | 30213    | 40213     |
 | Completions  | ollama claude code                         | 30221    | 40221     |
 | Reranking    |                                            | 30301    | 40301     |
+| App          | mineru                                     | 30030    | 40030     |
