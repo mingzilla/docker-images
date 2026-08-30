@@ -1,0 +1,33 @@
+services:
+  ollama:
+    image: ollama/ollama:0.33.2 # 0.32.12+ required: adds Qwen3.8 27B support
+    container_name: ollama-qwen3pt8_27b
+    ports:
+      - "30214:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_MODEL=qwen3.8:27b
+      # 24GB card: 18GB weights + ~4GB KV + ~1.5GB buffers. Only 16 of 64 layers
+      # are full-attention, so KV is 64KiB/token at f16 -> q8_0 halves it to fit 128K.
+      - OLLAMA_CONTEXT_LENGTH=131072
+      - OLLAMA_FLASH_ATTENTION=1
+      - OLLAMA_KV_CACHE_TYPE=q8_0
+    volumes:
+      - ollama_qwen3pt8_27b:/root/.ollama
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "ollama", "ps"]   # image has no curl/wget
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  ollama_qwen3pt8_27b:

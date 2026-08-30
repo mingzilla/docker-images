@@ -14,9 +14,8 @@ Note: for llm friendly create a fixed value table like the below:
 | Completions  | google/gemma4:e4b                          | 30204    | 40204     |
 | Completions  | google/gemma4:26b                          | 30205    | 40205     |
 | Completions  | vllm neuralmagic/Llama-3.2-3B-Instruct-FP4 | 30211    | 40211     |
-| Completions  | vllm Qwen2.5-32B-Instruct-NVFP4            | 30212    | 40212     |
 | Completions  | vllm nvidia/Qwen3-32B-NVFP4                | 30213    | 40213     |
-| Completions  | ollama-qwen3pt8_flash_next                 | 30214    | 40212     |
+| Completions  | ollama-qwen3pt8_27b (qwen3.8:27b)          | 30214    | 40212     |
 | Completions  | ollama claude code                         | 30221    | 40221     |
 | Reranking    |                                            | 30301    | 40301     |
 | App          | mineru                                     | 30030    | 40030     |

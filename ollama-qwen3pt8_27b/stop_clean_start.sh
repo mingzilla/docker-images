@@ -2,7 +2,7 @@
 set -e
 
 echo "🛑 Stopping and removing containers..."
-docker-compose down   # no -v: keeps the model volume (~105GB)
+docker-compose down   # no -v: keeps the model volume (~18GB)
 
 echo "⬆️  Refreshing Ollama image (:latest is cached otherwise)..."
 docker-compose pull
