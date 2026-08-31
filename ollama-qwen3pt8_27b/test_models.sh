@@ -15,5 +15,5 @@ function curl::test_model() {
     echo ""
 }
 
-MODEL=$(docker-compose exec -T ollama sh -c 'printf %s "$OLLAMA_MODEL"')
+MODEL=$(docker compose exec -T ollama sh -c 'printf %s "$OLLAMA_MODEL"')
 curl::test_model "$MODEL"

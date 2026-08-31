@@ -28,11 +28,15 @@ One wrapper script per backing model — pick the one whose container is running
 Each script sets the env vars that redirect Claude Code to Ollama:
 
 ```bash
+CLAUDE_CODE_ATTRIBUTION_HEADER=0
 ANTHROPIC_AUTH_TOKEN=ollama
 ANTHROPIC_BASE_URL=http://localhost:30214
 ANTHROPIC_API_KEY=""
 claude --model qwen3.8:27b
 ```
+
+`CLAUDE_CODE_ATTRIBUTION_HEADER=0` keeps the system-prompt prefix stable so Ollama
+reuses its cached KV prefix between turns instead of re-prefilling the whole context.
 
 ## Web tools
 
